@@ -1,0 +1,394 @@
+
+.\app\runtime\support\android\mtk\meta_backend_mtk_functions_d2g_minimal\bin\MTK_Functions.dll:	file format coff-i386
+Characteristics 0x2102
+	executable
+	32 bit words
+	DLL
+
+Time/Date               Mon Nov  4 08:29:23 2024
+Magic                   010b	(PE32)
+MajorLinkerVersion      10
+MinorLinkerVersion      0
+SizeOfCode              0000fe00
+SizeOfInitializedData   00007c00
+SizeOfUninitializedData 00000000
+AddressOfEntryPoint     0001028a
+BaseOfCode              00001000
+BaseOfData              00011000
+ImageBase               10000000
+SectionAlignment        00001000
+FileAlignment           00000200
+MajorOSystemVersion     5
+MinorOSystemVersion     1
+MajorImageVersion       0
+MinorImageVersion       0
+MajorSubsystemVersion   5
+MinorSubsystemVersion   1
+Win32Version            00000000
+SizeOfImage             0001b000
+SizeOfHeaders           00000400
+CheckSum                0002348b
+Subsystem               00000002	(Windows GUI)
+DllCharacteristics      00000140
+					DYNAMIC_BASE
+					NX_COMPAT
+SizeOfStackReserve      00100000
+SizeOfStackCommit       00001000
+SizeOfHeapReserve       00100000
+SizeOfHeapCommit        00001000
+LoaderFlags             00000000
+NumberOfRvaAndSizes     00000010
+
+The Data Directory
+Entry 0 000143c0 00001bc4 Export Directory [.edata (or where ever we found it)]
+Entry 1 00013bb8 0000008c Import Directory [parts of .idata]
+Entry 2 00017000 000002b8 Resource Directory [.rsrc]
+Entry 3 00000000 00000000 Exception Directory [.pdata]
+Entry 4 00000000 00000000 Security Directory
+Entry 5 00018000 00002244 Base Relocation Directory [.reloc]
+Entry 6 000111c0 0000001c Debug Directory
+Entry 7 00000000 00000000 Description Directory
+Entry 8 00000000 00000000 Special Directory
+Entry 9 00000000 00000000 Thread Storage Directory [.tls]
+Entry a 00013668 00000040 Load Configuration Directory
+Entry b 00000000 00000000 Bound Import Directory
+Entry c 00011000 000001a0 Import Address Table Directory
+Entry d 00000000 00000000 Delay Import Directory
+Entry e 00000000 00000000 CLR Runtime Header
+Entry f 00000000 00000000 Reserved
+
+Load configuration:
+  Timestamp: 0
+  Major Version: 0
+  Minor Version: 0
+  GlobalFlags Clear: 0
+  GlobalFlags Set: 0
+  Critical Section Default Timeout: 0
+  Decommit Free Block Threshold: 0
+  Decommit Total Free Threshold: 0
+  Lock Prefix Table: 0
+  Maximum Allocation Size: 0
+  Virtual Memory Threshold: 0
+  Process Affinity Mask: 0
+  Process Heap Flags: 0
+  CSD Version: 0
+  Security Cookie: 268525592
+  SEH Table: 268515296
+  SEH Count: 10
+
+SEH Table: 0x100104e9 0x100109d4 0x10010a14 0x10010a39 0x10010a81 0x10010b13 0x10010b7f 0x10010bc1 0x10010bf0 0x10010c18
+
+
+The Import Tables:
+  lookup 00013c44 time 00000000 fwd 00000000 name 00013ea2 addr 00011000
+
+    DLL Name: Basic.dll
+    Hint/Ord  Name
+          13  ?Hex2Buf@CBasic@@SAHV?$CStringT@DV?$StrTraitMFC_DLL@DV?$ChTraitsCRT@D@ATL@@@@@ATL@@PAEAAI@Z
+           5  ?Buf2Hex@CBasic@@SAXQAEIAAV?$CStringT@DV?$StrTraitMFC_DLL@DV?$ChTraitsCRT@D@ATL@@@@@ATL@@H@Z
+
+  lookup 00013d64 time 00000000 fwd 00000000 name 00013eac addr 00011120
+
+    DLL Name: mfc100.dll
+    Hint/Ord  Name
+       11744
+         266
+         265
+        7322
+        1313
+        1316
+        1480
+       11627
+        4143
+        4144
+        3404
+        7487
+        2611
+        1294
+        1448
+        4499
+        5207
+         300
+         310
+         901
+       13045
+       11439
+         316
+        3839
+       11781
+        2626
+         305
+        5242
+        1982
+        4283
+        1296
+
+  lookup 00013cc4 time 00000000 fwd 00000000 name 00013fba addr 00011080
+
+    DLL Name: MSVCR100.dll
+    Hint/Ord  Name
+        1487  memcpy
+        1491  memset
+         314  __CxxFrameHandler3
+        1520  sprintf_s
+        1546  strstr
+        1576  vsprintf_s
+        1505  rand
+        1522  srand
+        1526  strcat_s
+        1137  _time64
+         269  ?what@exception@std@@UBEPBDXZ
+          93  ??1exception@std@@UAE@XZ
+          34  ??0exception@std@@QAE@ABQBD@Z
+          36  ??0exception@std@@QAE@ABV01@@Z
+        1382  atoi
+        1488  memcpy_s
+         442  _access
+        1531  strcpy_s
+        1383  atol
+        1381  atof
+        1165  _unlock
+         347  __dllonexit
+         803  _lock
+         969  _onexit
+         820  _malloc_crt
+        1419  free
+         537  _encoded_null
+         688  _initterm
+         689  _initterm_e
+         453  _amsg_exit
+         305  __CppXcptFilter
+         258  ?terminate@@YAXXZ
+         507  _crt_debugger_hook
+         238  ?_type_info_dtor_internal_method@type_info@@QAEXXZ
+         545  _except_handler4_common
+         339  __clean_type_info_names_internal
+         289  _CxxThrowException
+
+  lookup 00013c50 time 00000000 fwd 00000000 name 000142fa addr 0001100c
+
+    DLL Name: KERNEL32.dll
+    Hint/Ord  Name
+         514  GetLastError
+         581  GetProcAddress
+         531  GetModuleFileNameA
+         829  LoadLibraryExA
+        1104  SetDllDirectoryA
+         828  LoadLibraryA
+         633  GetSystemTimeAsFileTime
+         449  GetCurrentProcessId
+         453  GetCurrentThreadId
+         659  GetTickCount
+         935  QueryPerformanceCounter
+         222  DisableThreadLibraryCalls
+         768  IsDebuggerPresent
+        1189  SetUnhandledExceptionFilter
+        1235  UnhandledExceptionFilter
+         448  GetCurrentProcess
+        1216  TerminateProcess
+         745  InterlockedCompareExchange
+        1202  Sleep
+         748  InterlockedExchange
+         202  DecodePointer
+         234  EncodePointer
+         577  GetPrivateProfileStringA
+         533  GetModuleHandleA
+         354  FreeLibrary
+
+  lookup 00013d5c time 00000000 fwd 00000000 name 0001431a addr 00011118
+
+    DLL Name: SHLWAPI.dll
+    Hint/Ord  Name
+          68  PathFileExistsA
+
+  lookup 00013cb8 time 00000000 fwd 00000000 name 00014366 addr 00011074
+
+    DLL Name: MSVCP100.dll
+    Hint/Ord  Name
+         652  ?_Xlength_error@std@@YAXPBD@Z
+         654  ?_Xout_of_range@std@@YAXPBD@Z
+
+Export Table:
+ DLL name: MTK_Functions.dll
+ Ordinal base: 1
+ Ordinal      RVA  Name
+       1   0xca60  _APMeta_ReadPSN@8
+       2   0x9880  _BPMeta_Modify_RAM_NV_PowerForAutoTestTool@4
+       3   0x5960  _Feature_Code_Verification@4
+       4   0x2e30  _GetMtkHandle@8
+       5   0x2d80  _InitMtkDll@0
+       6   0xab40  _MDMETA_GPS_Close_r@0
+       7   0xaa70  _MDMETA_GPS_MeasureRxCNR@4
+       8   0xa690  _MDMETA_RF_NR_CloseTxPower@0
+       9   0xa5e0  _MDMETA_RF_NR_SetTxPower@16
+      10   0xa9e0  _MDMETA_WIFI_MIMO_CloseTxPower@0
+      11   0xa740  _MDMETA_WIFI_MIMO_Init@4
+      12   0xa820  _MDMETA_WIFI_MIMO_SetTxPower@32
+      13   0xa900  _MDMETA_WIFI_MIMO_SetTxPower_4G@20
+      14   0x8480  _MDMeta_APNVBackup@4
+      15   0x85a0  _MDMeta_APNVRestore@4
+      16   0x8d30  _MDMeta_APNVRestore_FAETool@4
+      17   0xccd0  _MDMeta_Clear_AllSalesInfo@4
+      18   0x64e0  _MDMeta_ConnectInMetaModeByUSB_r@4
+      19   0x6410  _MDMeta_ConnectWithMultiModeTarget_r@20
+      20   0x67f0  _MDMeta_DebugOff@0
+      21   0x6760  _MDMeta_DebugOn_With_FilePath@4
+      22   0x6640  _MDMeta_DisconnectInMetaMode_r@0
+      23   0x66d0  _MDMeta_DisconnectWithTarget_r@0
+      24   0x69f0  _MDMeta_FP_APP_GetAvailableHandle@0
+      25   0x6a80  _MDMeta_FP_APP_Init@0
+      26   0x7f20  _MDMeta_FP_BackupNvram2SDS@0
+      27   0x6930  _MDMeta_FP_GetTargetVerInfoEx_r@12
+      28   0x6b10  _MDMeta_FP_NVram_Init@4
+      29   0x7e50  _MDMeta_FP_ReadBTMacFromNvram@4
+      30   0x7fb0  _MDMeta_FP_ReadChipID@8
+      31   0x7140  _MDMeta_FP_ReadIMEIfromNVRAM@16
+      32   0x7230  _MDMeta_FP_ReadPSN@12
+      33   0x7dc0  _MDMeta_FP_WriteBTMac2Nvram@4
+      34   0x6fb0  _MDMeta_FP_WriteIMEItoNVRAM@8
+      35   0x72f0  _MDMeta_FP_WritePSN@8
+      36   0x9eb0  _MDMeta_GSM_CloseTxPower@4
+      37   0x9de0  _MDMeta_GSM_SetTxPower@20
+      38   0x6580  _MDMeta_GetDynamicUSBComPort_r@8
+      39   0x6870  _MDMeta_GetTargetVerInfoEx_r@12
+      40   0x94c0  _MDMeta_IMEI_RECONSTRUCT@8
+      41   0x6bc0  _MDMeta_Init_Ex_2_r@0
+      42   0x6cf0  _MDMeta_Init_r@0
+      43   0xa530  _MDMeta_LTE_CloseTxPower@0
+      44   0xa3a0  _MDMeta_LTE_MeasureRssi@24
+      45   0xa470  _MDMeta_LTE_SetTxPower@28
+      46   0x7850  _MDMeta_<REDACTED_HEX_IDENTIFIER>@4
+      47   0x7a20  _MDMeta_<REDACTED_HEX_IDENTIFIER>_FAETool@4
+      48   0x78f0  _MDMeta_LoadFromFlashAndSaveToFile@4
+      49   0x7ac0  _MDMeta_LoadFromFlashAndSaveToFile_FAETool@4
+      50   0x8070  _MDMeta_Modify_TXDACPowerTable@8
+      51   0x6c50  _MDMeta_NVRAM_Init_Ex_Mdtype_r@4
+      52   0x7050  _MDMeta_ReadIMEIfromNVRAM@16
+      53   0x73c0  _MDMeta_ReadPSN@12
+      54   0x7480  _MDMeta_ReadWrite_CalFtFlag@12
+      55   0x82a0  _MDMeta_Read_DistanceSenser@8
+      56   0x8130  _MDMeta_Read_FP_BTMacFromNvram@8
+      57   0x81f0  _MDMeta_Read_lightSenser@8
+      58   0x7bf0  _MDMeta_StartLog@8
+      59   0x7ca0  _MDMeta_StopLog@0
+      60   0xa080  _MDMeta_WCDMA_CloseTxPower@4
+      61   0x9fb0  _MDMeta_WCDMA_SetTxPower@20
+      62   0x9c50  _MDMeta_WCDMA_UbinModeInit@8
+      63   0x9d20  _MDMeta_WCDMA_UbinModeSetup_r@4
+      64   0x95b0  _MDMeta_WriteAndReadSales_testFlag@4
+      65   0x6d80  _MDMeta_WriteIMEItoNVRAM@8
+      66   0x7d20  _MDMeta_WritePSN@12
+      67   0x8360  _MDMeta_Write_DistanceSenser@4
+      68   0x83f0  _MDMeta_Write_LightSenser@4
+      69   0xa200  _META_GetSlaStatus_r@4
+      70   0xa2d0  _META_VerifySla_r@4
+      71   0x3330  _Meta_Ap2ModemMeta@0
+      72   0x2f90  _Meta_ConnectPhone@40
+      73   0xcb10  _Meta_ConnectPhoneApOnly@40
+      74   0x3150  _Meta_ConnectPhone_Sample@8
+      75   0x3450  _Meta_DisconnectPhone@4
+      76   0x2f60  _Meta_GetLastError@8
+      77   0x33c0  _Meta_Modem2ApMeta@0
+      78   0xabe0  _NRCHAN2Freq@16
+      79   0x2ea0  _ReleaseMtkDll@0
+      80   0x52a0  _SPMETA_Customer_Read_BACKCAMID@4
+      81   0x53b0  _SPMETA_Write_OtpOneByOneData@28
+      82   0x40b0  _SPMeta_AttestationKey_Install_Set_r@4
+      83   0x7540  _SPMeta_BackupNVRam_2BinRegion@0
+      84   0x3930  _SPMeta_ConnectInMetaMode_r@4
+      85   0x36e0  _SPMeta_ConnectWithPreloader@8
+      86   0x4770  _SPMeta_Customer_Check_Attestation_Key@0
+      87   0x4920  _SPMeta_Customer_FactoryReset@0
+      88   0x4a70  _SPMeta_Customer_Query_All_Bench_Flag@4
+      89   0x4f20  _SPMeta_Customer_Read_Bench_Flag@12
+      90   0x51a0  _SPMeta_Customer_Read_MarketInfo@4
+      91   0x4800  _SPMeta_Customer_Reboot@0
+      92   0x49b0  _SPMeta_Customer_Shell_Command@12
+      93   0x5000  _SPMeta_Customer_Write_Bench_Flag@8
+      94   0x50c0  _SPMeta_Customer_Write_MarketInfo@4
+      95   0x3a80  _SPMeta_DebugOff@0
+      96   0x39d0  _SPMeta_DebugOnThePath@4
+      97   0x5520  _SPMeta_DisconnectInMetaMode_r@0
+      98   0x5490  _SPMeta_DisconnectWithTarget_r@0
+      99   0x3b10  _SPMeta_ENCRYPTED_Support_r@0
+     100   0x5830  _SPMeta_Enable_AdbDebug@4
+     101   0x34f0  _SPMeta_GetAvailableHandle@0
+     102   0x3f30  _SPMeta_GetChipId_r@12
+     103   0x3ff0  _SPMeta_GetTargetVerInfo_r@12
+     104   0x5770  _SPMeta_Get_AdbDebug_Status@4
+     105   0x3580  _SPMeta_Init_r@0
+     106   0x55b0  _SPMeta_Load_APDB_From_DUT_r@12
+     107   0x5690  _SPMeta_Load_BPDB_From_DUT_r@12
+     108   0x3ba0  _SPMeta_MODEM_Capability_r@12
+     109   0x3cf0  _SPMeta_MODEM_Get_CurrentModemType_r@4
+     110   0x3db0  _SPMeta_MODEM_Query_MDIMGType_r@4
+     111   0x3610  _SPMeta_NVRAM_Init_r@4
+     112   0x4150  _SPMeta_NVRAM_Read_r@16
+     113   0x42a0  _SPMeta_NVRAM_Write_r@16
+     114   0x37c0  _SPMeta_Preloader_BootMode@8
+     115   0x44d0  _SPMeta_ReadBTAddFromNVRAM@4
+     116   0x4890  _SPMeta_ReadBarcodeFromNVRAM@8
+     117   0x4620  _SPMeta_ReadWIFIAddFromNVRAM@4
+     118   0x96c0  _SPMeta_SP_META_Nvram_Backup_r@12
+     119   0x97a0  _SPMeta_SP_META_Nvram_Restore_r@12
+     120   0x3870  _SPMeta_SearchKernelPort@8
+     121   0x5a80  _SPMeta_WIFI_CLOSE_r@0
+     122   0x5ba0  _SPMeta_WIFI_GetChipVersion_r@8
+     123   0x58d0  _SPMeta_WIFI_OPEN_r@0
+     124   0x5c60  _SPMeta_WIFI_QueryConfig_r@0
+     125   0x61d0  _SPMeta_WIFI_ReceivedErrorCount_r@8
+     126   0x6290  _SPMeta_WIFI_ReceivedOKCount_r@8
+     127   0x6350  _SPMeta_WIFI_ReceivedRSSI_r@8
+     128   0x5b10  _SPMeta_WIFI_readMCR32_r@0
+     129   0x5e10  _SPMeta_WIFI_setBandwidth_r@4
+     130   0x5eb0  _SPMeta_WIFI_setChannel_r@8
+     131   0x5ff0  _SPMeta_WIFI_setPacketTxEx_r@12
+     132   0x5f50  _SPMeta_WIFI_setRate_r@4
+     133   0x6130  _SPMeta_WIFI_setRxTest_r@4
+     134   0x6090  _SPMeta_WIFI_setStandBy_r@4
+     135   0x5cf0  _SPMeta_WIFI_setTestMode_r@0
+     136   0x5d80  _SPMeta_WIFI_switchAntenna_r@0
+     137   0x4590  _SPMeta_WriteBTAdd2NVRAM@4
+     138   0x4430  _SPMeta_WritePSN@8
+     139   0x46e0  _SPMeta_WriteWIFIAdd2NVRAM@4
+     140   0xc970  _SP_META_AntiRollBack_AuthFlieDownload@8
+     141   0xc890  _SP_META_AntiRollBack_CheckBootPara@4
+     142   0xc6b0  _SP_META_AntiRollBack_GetBootPara@8
+     143   0xc4e0  _SP_META_AntiRollBack_GetRandNub@4
+     144   0xc5c0  _SP_META_AntiRollBack_SendFacCertAndSign@8
+     145   0xc7a0  _SP_META_AntiRollBack_SendFacCertAndSignSec@8
+     146   0xbf40  _SP_META_Customer_Check_Simlock_MCCMNC@4
+     147   0xbd90  _SP_META_Customer_Clear_CSR@4
+     148   0xb7f0  _SP_META_Customer_Device_IsSupport@0
+     149   0xba60  _SP_META_Customer_Device_IsWriteKey@4
+     150   0xbbd0  _SP_META_Customer_Generate_CSR@4
+     151   0xbcb0  _SP_META_Customer_Get_CSR@4
+     152   0xb880  _SP_META_Customer_Get_PublicKey@8
+     153   0xbb40  _SP_META_Customer_IsSupport_CSR@0
+     154   0xc020  _SP_META_Customer_Read_Simlock_MCCMNC@4
+     155   0xb970  _SP_META_Customer_Verify_Sign@12
+     156   0xc100  _SP_META_Customer_Write_Simlock_MCCMNC@4
+     157   0x9bc0  _SP_META_DRMKey_Install_Query_r@0
+     158   0x9af0  _SP_META_DRMKey_Install_Set_r@4
+     159   0xa160  _SP_META_Enable_FactoryATA@4
+     160   0xcdd0  _SP_META_RPMB_Active@8
+     161   0xd560  _SP_META_RPMB_AuthFlieDownload@8
+     162   0xd470  _SP_META_RPMB_CleanUpData@8
+     163   0xd090  _SP_META_RPMB_GetData@44
+     164   0xd650  _SP_META_RPMB_GetErrorInfo@4
+     165   0xcfa0  _SP_META_RPMB_GetRandNub@8
+     166   0xcec0  _SP_META_RPMB_IsEnable@4
+     167   0xd2b0  _SP_META_RPMB_IsSupportFactoryActive@4
+     168   0xd380  _SP_META_RPMB_SendFacCertAndSign@8
+     169   0xd1a0  _SP_META_RPMB_WriteData@44
+     170   0x6ec0  _SP_META_ReadIMEI@8
+     171   0xbe70  _SP_META_ReadSimLockMccMncSupport@4
+     172   0xc1e0  _SP_META_ReadWrite_EMMCBatteryFlag@12
+     173   0xc3e0  _SP_META_ReadWrite_MCCData@12
+     174   0xc2e0  _SP_META_ReadWrite_PaytriggerData@12
+     175   0x6e20  _SP_META_writeIMEI@8
+     176   0x2e70  _SetMtkHandle@8
+     177   0x99f0  _WriteBlobData_NVRam_Start@16
+     178   0x9920  _WritePublicKey_NVRam_Start@8
+
+

@@ -1,0 +1,38 @@
+D4 NATIVE EXISTING-META READ-ONLY MODEM INVENTORY
+
+Connection
+- Device: VID_0E8D PID_2007 COM15
+- Native AP handle: 0
+- Platform: MT6789
+- ChipID: <REDACTED_HEX_IDENTIFIER>
+
+Successful SP-native modem reads
+- Capability confirmation: 2, 2
+- Current modem type: 9
+- Query info confirmation: 1, 1
+- MD image type: 12
+- Modem mode: 0
+- Download status: 0
+- Device MD database path: /data/vendor_de/meta/mddb
+
+Partial reads
+- Modem state returned 1; confirmation began with value 9
+- EE info returned 1; confirmation included /data/vendor_de/meta/mddb and opaque state data
+
+Separate MD/NVRAM connector
+- Isolated modem handle: 1
+- META_Init_r: success
+- CShare existing-AP transport selected
+- META_ConnectModem_r: result 2
+- META_Deinit_r: success
+
+Decision
+- Continue using the AP handle for proven SP-native read-only inventory.
+- PSN, IMEI, MAC, barcode, and calibration reads still require a proven database-loading/read contract or valid separate MD/NVRAM connector.
+
+Safety
+- No NVRAM write
+- No reset, reboot, format, FRP, unlock, or shell
+- Native disconnect and deinit succeeded
+
+

@@ -1,0 +1,124 @@
+[gate] D4 native MetaCore existing-META only; COM15 shape=TargetVerInfo nativeRead=None vendorRead=None
+[guard] native attach is source of truth; post-connect allowlisted read helper only; NO generic NVRAM/write/reset/FRP/format/unlock/shell/reboot
+[load] MetaCore=0x05000000 gle=0
+[resolve] SP_META_Init=0x05255980
+[resolve] SP_META_Deinit=0x0524D420
+[resolve] SP_META_ConnectInMetaModeByUSB=0x05254640
+[resolve] SP_META_DisconnectInMetaMode_r=0x052520C0
+[resolve] SP_META_GetTargetVerInfo_r=0x0524F8F0
+[resolve] SP_META_GetChipID_r=0x05293570
+[resolve] META_ConnectModem_r=0x0534CBA0
+[resolve] META_GetAvailableHandle=0x05344CD0
+[resolve] META_Init_r=0x053527F0
+[resolve] META_Deinit_r=0x05348570
+[resolve] META_DisconnectWithTarget_r=0x0534CCB0
+[resolve] META_QueryCurrentModem_r=0x053504D0
+[resolve] META_QueryCurrentModemType_r=0x00000000
+[resolve] META_QueryConnectionInfo_r=0x0534DBD0
+[resolve] META_GetModemVersionInfo_r=0x0534A160
+[resolve] SP_META_MODEM_Capability_r=0x05263890
+[resolve] SP_META_MODEM_Get_CurrentModemType_r=0x05263AD0
+[resolve] SP_META_MODEM_Get_ModemState_r=0x05264330
+[resolve] SP_META_MODEM_Query_Info_r=0x05264530
+[resolve] SP_META_MODEM_Query_MDIMGType_r=0x05263BF0
+[resolve] SP_META_MODEM_Get_ModemMode_r=0x05264030
+[resolve] SP_META_MODEM_Query_Download_Status_r=0x05263D10
+[resolve] SP_META_MODEM_Query_MDDBPath_r=0x05264130
+[resolve] SP_META_MODEM_Get_EEInfo_r=0x05264430
+[resolve] SP_META_Query_APDBPath_r=0x05257090
+[resolve] SP_META_File_Operation_Parse_r=0x0525D300
+[resolve] SP_META_File_Operation_GetFileInfo_r=0x0525C910
+[resolve] SP_META_File_Operation_ReceiveFile_r=0x0525D240
+[resolve] SP_META_NVRAM_Init_r=0x052BE830
+[resolve] META_MISC_GetIMEIRecNum_r=0x0535D380
+[resolve] META_MISC_GetIMEILocation_r=0x0535D050
+[resolve] META_MISC_GetCalFlagEnum_r=0x0535E9C0
+[resolve] META_MISC_GetRfCalEnvEnum_r=0x0535E9E0
+[call] SP_META_Init(errorCallback) native global session only
+[ret] Init=0
+[call] SP_META_ConnectInMetaModeByUSB(req,outHandle,report) COM15
+[ret] Connect=0 activeHandle=0 report=<REDACTED_DECIMAL_IDENTIFIER>
+[call] SP_META_GetTargetVerInfo_r(activeHandle,callback,token,context)
+[callback] TargetVerInfo token=2 context=0xD4000001 cnf=0x0618F280 first64=<REDACTED_HEX_IDENTIFIER>
+[info] Platform=MT6789
+[info] SoftwareVersion=alps-mp-s0.mp1.rc-V17.23_reallytek.s0mp1rc.k61v1.64.bsp_P24
+[info] BuildDate=Thu Sep  4 13:04:01 CST 2025
+[ret] TargetVerInfo=0 token=2 callback=1
+[call] SP_META_GetChipID_r(activeHandle,timeout,out[17])
+[ret] ChipID=0
+[info] ChipID=<REDACTED_HEX_IDENTIFIER>
+[call] SP_META_MODEM_Capability_r(activeHandle,timeout,zeroQuery,confirmation) read-only
+[ret] SpModemCapability=0
+[info] SpModemCapabilityCnf=<REDACTED_HEX_IDENTIFIER>
+[call] SP_META_MODEM_Get_CurrentModemType_r(activeHandle,timeout,zeroQuery,confirmation) read-only
+[ret] SpCurrentModemType=0
+[info] SpCurrentModemTypeCnf=<REDACTED_HEX_IDENTIFIER>
+[call] SP_META_MODEM_Get_ModemState_r(activeHandle,timeout,zeroQuery,confirmation) read-only
+[ret] SpModemState=1
+[info] SpModemStateCnf=<REDACTED_HEX_IDENTIFIER>
+[call] SP_META_MODEM_Query_Info_r(activeHandle,timeout,zeroQuery,confirmation) read-only
+[ret] SpModemInfo=0
+[info] SpModemInfoCnf=<REDACTED_HEX_IDENTIFIER>
+[call] SP_META_MODEM_Query_MDIMGType_r(activeHandle,timeout,zeroQuery,confirmation) read-only
+[ret] SpMdImgType=0
+[info] SpMdImgTypeCnf=<REDACTED_HEX_IDENTIFIER>
+[call] SP_META_MODEM_Get_ModemMode_r(activeHandle,timeout,zeroQuery,confirmation) read-only
+[ret] SpModemMode=0
+[info] SpModemModeCnf=<REDACTED_HEX_IDENTIFIER>
+[call] SP_META_MODEM_Query_Download_Status_r(activeHandle,timeout,zeroQuery,confirmation) read-only
+[ret] SpDownloadStatus=0
+[info] SpDownloadStatusCnf=<REDACTED_HEX_IDENTIFIER>
+[call] SP_META_MODEM_Query_MDDBPath_r(activeHandle,timeout,zeroQuery,confirmation) read-only
+[ret] SpMdDbPath=0
+[info] SpMdDbPathCnf=<REDACTED_HEX_IDENTIFIER>
+[call] SP_META_Query_APDBPath_r(activeHandle,timeout,zeroQuery,confirmation) read-only
+[ret] SpApDbPath=0
+[info] SpApDbPathCnf=<REDACTED_HEX_IDENTIFIER>
+[call] SP_META_MODEM_Get_EEInfo_r(activeHandle,timeout,zeroQuery,confirmation) read-only
+[ret] SpEeInfo=1
+[info] SpEeInfoCnf=<REDACTED_HEX_IDENTIFIER>
+[call] META_MISC_GetIMEIRecNum_r(activeHandle,timeout,out) read-only
+[ret] ImeiRecNum=2
+[info] ImeiRecNumOut=<REDACTED_HEX_IDENTIFIER>
+[call] META_MISC_GetIMEILocation_r(activeHandle,timeout,out) read-only
+[ret] ImeiLocation=2
+[info] ImeiLocationOut=<REDACTED_HEX_IDENTIFIER>
+[call] META_MISC_GetCalFlagEnum_r(activeHandle,timeout,out) read-only
+[ret] CalFlagEnum=2
+[info] CalFlagEnumOut=<REDACTED_HEX_IDENTIFIER>
+[call] META_MISC_GetRfCalEnvEnum_r(activeHandle,timeout,out) read-only
+[ret] RfCalEnvEnum=2
+[info] RfCalEnvEnumOut=<REDACTED_HEX_IDENTIFIER>
+[call] META_QueryCurrentModem_r(activeHandle,outCurrentModem) read-only
+[ret] QueryCurrentModem=0 currentModem=0
+[call] META_QueryCurrentModemType_r(activeHandle,outCurrentModemType) read-only
+[ret] QueryCurrentModemType=-1 currentModemType=4294967295 (0xFFFFFFFF)
+[call] META_QueryConnectionInfo_r(activeHandle,out0,out1) read-only
+[ret] QueryConnectionInfo=0 info0=0 info1=1
+[diagnostic-call] receive matched APDB files then initialize host-side SP NVRAM parser; no record read/write
+[database-receive-call] source=/vendor/etc/apdb/APDB_MT6789___W2452 dest=D:\projects\in progress\TGT ATO iDiot proof\audit_shared_runtime\D4_NATIVE_METACORE_TargetVerInfo_None_20260613_010541\APDB_MT6789___W2452
+[database-receive-ret] name=APDB_MT6789___W2452 ret=0 hostSize=259192
+[database-receive-call] source=/vendor/etc/apdb/APDB_MT6789___W2452_ENUM dest=D:\projects\in progress\TGT ATO iDiot proof\audit_shared_runtime\D4_NATIVE_METACORE_TargetVerInfo_None_20260613_010541\APDB_MT6789___W2452_ENUM
+[database-receive-ret] name=APDB_MT6789___W2452_ENUM ret=0 hostSize=22552
+[database-init-call] SP_META_NVRAM_Init_r(activeHandle,matchedLocalAPDB,out) host parser initialization
+[database-init-ret] ret=0 out=67640144
+[bridge-request] currentModem=0 connectionInfo=0/1 logged; not copied into transport fields
+[bridge-request] offset24=2 (native CShare existing-AP transport)
+[call] META_GetAvailableHandle(&modemHandle) host-side modem session allocation
+[ret] GetAvailableHandle=0 modemHandle=1
+[call] META_Init_r(modemHandle,errorCallback) isolated host-side modem session
+[ret] InitModemHandle=0
+[call] META_ConnectModem_r(modemHandle,query-populated-modem-request,report)
+[ret] ConnectModem=2 report=[info] ModemConnectReport=<REDACTED_HEX_IDENTIFIER>
+[native-read-gate] modem bridge unavailable; modem getter skipped
+[call] META_Deinit_r(&modemHandle)
+[ret] DeinitModemHandle=0 modemHandle=1
+[vendor] disabled
+[call] SP_META_DisconnectInMetaMode_r(activeHandle)
+[ret] Disconnect=0
+[call] SP_META_Deinit() before secondary phase
+[ret] Deinit=0
+[native] MetaCore unloaded before secondary phase
+[done] init=0 connect=0 active=0 targetVer=0 callback=1 chipId=0 vendorRead=-1 disconnect=0 deinit=0
+
+

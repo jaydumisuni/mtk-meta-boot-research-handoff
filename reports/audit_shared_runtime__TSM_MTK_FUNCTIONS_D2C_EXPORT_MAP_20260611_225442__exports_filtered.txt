@@ -1,0 +1,213 @@
+[DEBUG:ext\vcvars.bat] Found potential v145 version file: 'Microsoft.VCToolsVersion.VC.14.50.18.0.txt'
+[DEBUG:ext\vcvars.bat] Testing v145 version file: 'Microsoft.VCToolsVersion.VC.14.50.18.0.txt'
+[vcvarsall.bat] Environment initialized for: 'x86'
+Microsoft (R) COFF/PE Dumper Version 14.50.35721.0
+Dump of file D:\projects\in progress\TGT ATO iDiot proof\app\runtime\support\android\mtk\meta_backend_mtk_functions_gold\bin\MTK_Functions.dll
+  Section contains the following exports for MTK_Functions.dll
+        0.00 version
+          1    0 0000CA60 _APMeta_ReadPSN@8
+          2    1 00009880 _BPMeta_Modify_RAM_NV_PowerForAutoTestTool@4
+          4    3 00002E30 _GetMtkHandle@8
+          5    4 00002D80 _InitMtkDll@0
+          6    5 0000AB40 _MDMETA_GPS_Close_r@0
+          7    6 0000AA70 _MDMETA_GPS_MeasureRxCNR@4
+          8    7 0000A690 _MDMETA_RF_NR_CloseTxPower@0
+          9    8 0000A5E0 _MDMETA_RF_NR_SetTxPower@16
+         10    9 0000A9E0 _MDMETA_WIFI_MIMO_CloseTxPower@0
+         11    A 0000A740 _MDMETA_WIFI_MIMO_Init@4
+         12    B 0000A820 _MDMETA_WIFI_MIMO_SetTxPower@32
+         13    C 0000A900 _MDMETA_WIFI_MIMO_SetTxPower_4G@20
+         14    D 00008480 _MDMeta_APNVBackup@4
+         15    E 000085A0 _MDMeta_APNVRestore@4
+         16    F 00008D30 _MDMeta_APNVRestore_FAETool@4
+         17   10 0000CCD0 _MDMeta_Clear_AllSalesInfo@4
+         18   11 000064E0 _MDMeta_ConnectInMetaModeByUSB_r@4
+         19   12 00006410 _MDMeta_ConnectWithMultiModeTarget_r@20
+         20   13 000067F0 _MDMeta_DebugOff@0
+         21   14 00006760 _MDMeta_DebugOn_With_FilePath@4
+         22   15 00006640 _MDMeta_DisconnectInMetaMode_r@0
+         23   16 000066D0 _MDMeta_DisconnectWithTarget_r@0
+         24   17 000069F0 _MDMeta_FP_APP_GetAvailableHandle@0
+         25   18 00006A80 _MDMeta_FP_APP_Init@0
+         26   19 00007F20 _MDMeta_FP_BackupNvram2SDS@0
+         27   1A 00006930 _MDMeta_FP_GetTargetVerInfoEx_r@12
+         28   1B 00006B10 _MDMeta_FP_NVram_Init@4
+         29   1C 00007E50 _MDMeta_FP_ReadBTMacFromNvram@4
+         30   1D 00007FB0 _MDMeta_FP_ReadChipID@8
+         31   1E 00007140 _MDMeta_FP_ReadIMEIfromNVRAM@16
+         32   1F 00007230 _MDMeta_FP_ReadPSN@12
+         33   20 00007DC0 _MDMeta_FP_WriteBTMac2Nvram@4
+         34   21 00006FB0 _MDMeta_FP_WriteIMEItoNVRAM@8
+         35   22 000072F0 _MDMeta_FP_WritePSN@8
+         36   23 00009EB0 _MDMeta_GSM_CloseTxPower@4
+         37   24 00009DE0 _MDMeta_GSM_SetTxPower@20
+         38   25 00006580 _MDMeta_GetDynamicUSBComPort_r@8
+         39   26 00006870 _MDMeta_GetTargetVerInfoEx_r@12
+         40   27 000094C0 _MDMeta_IMEI_RECONSTRUCT@8
+         41   28 00006BC0 _MDMeta_Init_Ex_2_r@0
+         42   29 00006CF0 _MDMeta_Init_r@0
+         43   2A 0000A530 _MDMeta_LTE_CloseTxPower@0
+         44   2B 0000A3A0 _MDMeta_LTE_MeasureRssi@24
+         45   2C 0000A470 _MDMeta_LTE_SetTxPower@28
+         46   2D 00007850 _MDMeta_<REDACTED_HEX_IDENTIFIER>@4
+         47   2E 00007A20 _MDMeta_<REDACTED_HEX_IDENTIFIER>_FAETool@4
+         48   2F 000078F0 _MDMeta_LoadFromFlashAndSaveToFile@4
+         49   30 00007AC0 _MDMeta_LoadFromFlashAndSaveToFile_FAETool@4
+         50   31 00008070 _MDMeta_Modify_TXDACPowerTable@8
+         51   32 00006C50 _MDMeta_NVRAM_Init_Ex_Mdtype_r@4
+         52   33 00007050 _MDMeta_ReadIMEIfromNVRAM@16
+         53   34 000073C0 _MDMeta_ReadPSN@12
+         54   35 00007480 _MDMeta_ReadWrite_CalFtFlag@12
+         55   36 000082A0 _MDMeta_Read_DistanceSenser@8
+         56   37 00008130 _MDMeta_Read_FP_BTMacFromNvram@8
+         57   38 000081F0 _MDMeta_Read_lightSenser@8
+         58   39 00007BF0 _MDMeta_StartLog@8
+         59   3A 00007CA0 _MDMeta_StopLog@0
+         60   3B 0000A080 _MDMeta_WCDMA_CloseTxPower@4
+         61   3C 00009FB0 _MDMeta_WCDMA_SetTxPower@20
+         62   3D 00009C50 _MDMeta_WCDMA_UbinModeInit@8
+         63   3E 00009D20 _MDMeta_WCDMA_UbinModeSetup_r@4
+         64   3F 000095B0 _MDMeta_WriteAndReadSales_testFlag@4
+         65   40 00006D80 _MDMeta_WriteIMEItoNVRAM@8
+         66   41 00007D20 _MDMeta_WritePSN@12
+         67   42 00008360 _MDMeta_Write_DistanceSenser@4
+         68   43 000083F0 _MDMeta_Write_LightSenser@4
+         69   44 0000A200 _META_GetSlaStatus_r@4
+         70   45 0000A2D0 _META_VerifySla_r@4
+         71   46 00003330 _Meta_Ap2ModemMeta@0
+         72   47 00002F90 _Meta_ConnectPhone@40
+         73   48 0000CB10 _Meta_ConnectPhoneApOnly@40
+         74   49 00003150 _Meta_ConnectPhone_Sample@8
+         75   4A 00003450 _Meta_DisconnectPhone@4
+         76   4B 00002F60 _Meta_GetLastError@8
+         77   4C 000033C0 _Meta_Modem2ApMeta@0
+         79   4E 00002EA0 _ReleaseMtkDll@0
+         80   4F 000052A0 _SPMETA_Customer_Read_BACKCAMID@4
+         81   50 000053B0 _SPMETA_Write_OtpOneByOneData@28
+         82   51 000040B0 _SPMeta_AttestationKey_Install_Set_r@4
+         83   52 00007540 _SPMeta_BackupNVRam_2BinRegion@0
+         84   53 00003930 _SPMeta_ConnectInMetaMode_r@4
+         85   54 000036E0 _SPMeta_ConnectWithPreloader@8
+         86   55 00004770 _SPMeta_Customer_Check_Attestation_Key@0
+         87   56 00004920 _SPMeta_Customer_FactoryReset@0
+         88   57 00004A70 _SPMeta_Customer_Query_All_Bench_Flag@4
+         89   58 00004F20 _SPMeta_Customer_Read_Bench_Flag@12
+         90   59 000051A0 _SPMeta_Customer_Read_MarketInfo@4
+         91   5A 00004800 _SPMeta_Customer_Reboot@0
+         92   5B 000049B0 _SPMeta_Customer_Shell_Command@12
+         93   5C 00005000 _SPMeta_Customer_Write_Bench_Flag@8
+         94   5D 000050C0 _SPMeta_Customer_Write_MarketInfo@4
+         95   5E 00003A80 _SPMeta_DebugOff@0
+         96   5F 000039D0 _SPMeta_DebugOnThePath@4
+         97   60 00005520 _SPMeta_DisconnectInMetaMode_r@0
+         98   61 00005490 _SPMeta_DisconnectWithTarget_r@0
+         99   62 00003B10 _SPMeta_ENCRYPTED_Support_r@0
+        100   63 00005830 _SPMeta_Enable_AdbDebug@4
+        101   64 000034F0 _SPMeta_GetAvailableHandle@0
+        102   65 00003F30 _SPMeta_GetChipId_r@12
+        103   66 00003FF0 _SPMeta_GetTargetVerInfo_r@12
+        104   67 00005770 _SPMeta_Get_AdbDebug_Status@4
+        105   68 00003580 _SPMeta_Init_r@0
+        106   69 000055B0 _SPMeta_Load_APDB_From_DUT_r@12
+        107   6A 00005690 _SPMeta_Load_BPDB_From_DUT_r@12
+        108   6B 00003BA0 _SPMeta_MODEM_Capability_r@12
+        109   6C 00003CF0 _SPMeta_MODEM_Get_CurrentModemType_r@4
+        110   6D 00003DB0 _SPMeta_MODEM_Query_MDIMGType_r@4
+        111   6E 00003610 _SPMeta_NVRAM_Init_r@4
+        112   6F 00004150 _SPMeta_NVRAM_Read_r@16
+        113   70 000042A0 _SPMeta_NVRAM_Write_r@16
+        114   71 000037C0 _SPMeta_Preloader_BootMode@8
+        115   72 000044D0 _SPMeta_ReadBTAddFromNVRAM@4
+        116   73 00004890 _SPMeta_ReadBarcodeFromNVRAM@8
+        117   74 00004620 _SPMeta_ReadWIFIAddFromNVRAM@4
+        118   75 000096C0 _SPMeta_SP_META_Nvram_Backup_r@12
+        119   76 000097A0 _SPMeta_SP_META_Nvram_Restore_r@12
+        120   77 00003870 _SPMeta_SearchKernelPort@8
+        121   78 00005A80 _SPMeta_WIFI_CLOSE_r@0
+        122   79 00005BA0 _SPMeta_WIFI_GetChipVersion_r@8
+        123   7A 000058D0 _SPMeta_WIFI_OPEN_r@0
+        124   7B 00005C60 _SPMeta_WIFI_QueryConfig_r@0
+        125   7C 000061D0 _SPMeta_WIFI_ReceivedErrorCount_r@8
+        126   7D 00006290 _SPMeta_WIFI_ReceivedOKCount_r@8
+        127   7E 00006350 _SPMeta_WIFI_ReceivedRSSI_r@8
+        128   7F 00005B10 _SPMeta_WIFI_readMCR32_r@0
+        129   80 00005E10 _SPMeta_WIFI_setBandwidth_r@4
+        130   81 00005EB0 _SPMeta_WIFI_setChannel_r@8
+        131   82 00005FF0 _SPMeta_WIFI_setPacketTxEx_r@12
+        132   83 00005F50 _SPMeta_WIFI_setRate_r@4
+        133   84 00006130 _SPMeta_WIFI_setRxTest_r@4
+        134   85 00006090 _SPMeta_WIFI_setStandBy_r@4
+        135   86 00005CF0 _SPMeta_WIFI_setTestMode_r@0
+        136   87 00005D80 _SPMeta_WIFI_switchAntenna_r@0
+        137   88 00004590 _SPMeta_WriteBTAdd2NVRAM@4
+        138   89 00004430 _SPMeta_WritePSN@8
+        139   8A 000046E0 _SPMeta_WriteWIFIAdd2NVRAM@4
+        140   8B 0000C970 _SP_META_AntiRollBack_AuthFlieDownload@8
+        141   8C 0000C890 _SP_META_AntiRollBack_CheckBootPara@4
+        142   8D 0000C6B0 _SP_META_AntiRollBack_GetBootPara@8
+        143   8E 0000C4E0 _SP_META_AntiRollBack_GetRandNub@4
+        144   8F 0000C5C0 _SP_META_AntiRollBack_SendFacCertAndSign@8
+        145   90 0000C7A0 _SP_META_AntiRollBack_SendFacCertAndSignSec@8
+        146   91 0000BF40 _SP_META_Customer_Check_Simlock_MCCMNC@4
+        147   92 0000BD90 _SP_META_Customer_Clear_CSR@4
+        148   93 0000B7F0 _SP_META_Customer_Device_IsSupport@0
+        149   94 0000BA60 _SP_META_Customer_Device_IsWriteKey@4
+        150   95 0000BBD0 _SP_META_Customer_Generate_CSR@4
+        151   96 0000BCB0 _SP_META_Customer_Get_CSR@4
+        152   97 0000B880 _SP_META_Customer_Get_PublicKey@8
+        153   98 0000BB40 _SP_META_Customer_IsSupport_CSR@0
+        154   99 0000C020 _SP_META_Customer_Read_Simlock_MCCMNC@4
+        155   9A 0000B970 _SP_META_Customer_Verify_Sign@12
+        156   9B 0000C100 _SP_META_Customer_Write_Simlock_MCCMNC@4
+        157   9C 00009BC0 _SP_META_DRMKey_Install_Query_r@0
+        158   9D 00009AF0 _SP_META_DRMKey_Install_Set_r@4
+        159   9E 0000A160 _SP_META_Enable_FactoryATA@4
+        160   9F 0000CDD0 _SP_META_RPMB_Active@8
+        161   A0 0000D560 _SP_META_RPMB_AuthFlieDownload@8
+        162   A1 0000D470 _SP_META_RPMB_CleanUpData@8
+        163   A2 0000D090 _SP_META_RPMB_GetData@44
+        164   A3 0000D650 _SP_META_RPMB_GetErrorInfo@4
+        165   A4 0000CFA0 _SP_META_RPMB_GetRandNub@8
+        166   A5 0000CEC0 _SP_META_RPMB_IsEnable@4
+        167   A6 0000D2B0 _SP_META_RPMB_IsSupportFactoryActive@4
+        168   A7 0000D380 _SP_META_RPMB_SendFacCertAndSign@8
+        169   A8 0000D1A0 _SP_META_RPMB_WriteData@44
+        170   A9 00006EC0 _SP_META_ReadIMEI@8
+        171   AA 0000BE70 _SP_META_ReadSimLockMccMncSupport@4
+        172   AB 0000C1E0 _SP_META_ReadWrite_EMMCBatteryFlag@12
+        173   AC 0000C3E0 _SP_META_ReadWrite_MCCData@12
+        174   AD 0000C2E0 _SP_META_ReadWrite_PaytriggerData@12
+        175   AE 00006E20 _SP_META_writeIMEI@8
+        176   AF 00002E70 _SetMtkHandle@8
+        177   B0 000099F0 _WriteBlobData_NVRam_Start@16
+        178   B1 00009920 _WritePublicKey_NVRam_Start@8
+Microsoft (R) COFF/PE Dumper Version 14.50.35721.0
+Dump of file D:\projects\in progress\TGT ATO iDiot proof\app\runtime\support\android\mtk\meta_backend_mtk_functions_gold\bin\MTK_Functions.dll
+  Section contains the following imports:
+              10011000 Import Address Table
+              10013C44 Import Name Table
+              10011120 Import Address Table
+              10013D64 Import Name Table
+              10011080 Import Address Table
+              10013CC4 Import Name Table
+                  13A __CxxFrameHandler3
+                  2B0 _initterm
+                  2B1 _initterm_e
+                   EE ?_type_info_dtor_internal_method@type_info@@QAEXXZ
+                  221 _except_handler4_common
+                  153 __clean_type_info_names_internal
+    KERNEL32.dll
+              1001100C Import Address Table
+              10013C50 Import Name Table
+                  4A5 SetUnhandledExceptionFilter
+                  4D3 UnhandledExceptionFilter
+                  215 GetModuleHandleA
+              10011118 Import Address Table
+              10013D5C Import Name Table
+              10011074 Import Address Table
+              10013CB8 Import Name Table
+Microsoft (R) COFF/PE Dumper Version 14.50.35721.0
+Dump of file D:\projects\in progress\TGT ATO iDiot proof\app\runtime\support\android\mtk\meta_backend_mtk_functions_gold\bin\MTK_Functions.dll
+    KERNEL32.dll
+
+

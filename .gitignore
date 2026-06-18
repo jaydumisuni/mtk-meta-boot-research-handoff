@@ -1,0 +1,15 @@
+*.dll
+*.exe
+*.obj
+*.pdb
+*.ilk
+*.lib
+*.exp
+APDB_*
+*_ENUM
+bin/
+MtkCoreDlls*/
+MTKDLLs/
+Objects/
+*.zip
+

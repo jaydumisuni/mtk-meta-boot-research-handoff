@@ -1,0 +1,38 @@
+D4 NATIVE EXISTING-META READ-ONLY IDENTIFIER BOUNDARY
+
+Successful database path reads
+- APDB path: vendor/etc/apdb
+- MDDB path: /data/vendor_de/meta/mddb
+
+Successful native SP inventory
+- Platform: MT6789
+- ChipID: <REDACTED_HEX_IDENTIFIER>
+- Modem capability: 2, 2
+- Current modem type: 9
+- MD image type: 12
+- Modem info: 1, 1
+- Modem mode: 0
+- Download status: 0
+
+Dedicated identifier metadata results
+- IMEI record count: result 2, empty
+- IMEI location: result 2, empty
+- Barcode: result 2, empty
+- Calibration flag enum: result 2, empty
+- RF calibration environment enum: result 2, empty
+
+Connector results
+- Isolated native modem handle allocation/init: success
+- Native CShare modem connector: result 2
+- Secondary wrapper existing-META connector: timed out after 30 seconds
+
+Conclusion
+- AP and SP-native modem inventory services are readable.
+- Separate MD/NVRAM database service is not established.
+- PSN, IMEI, MAC, barcode, and calibration values still require the separate service or a proven database-loading contract.
+
+Safety
+- No writes, reset, reboot, format, FRP, unlock, or shell
+- Device remained on PID_2007 COM15
+
+

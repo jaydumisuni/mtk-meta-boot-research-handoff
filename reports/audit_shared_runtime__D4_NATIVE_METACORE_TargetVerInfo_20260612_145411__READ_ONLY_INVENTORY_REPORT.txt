@@ -1,0 +1,87 @@
+D4 NATIVE EXISTING-META READ-ONLY INVENTORY
+
+Connection
+- Device: VID_0E8D PID_2007 COM15
+- Native connector: SP_META_ConnectInMetaModeByUSB
+- Existing META detected; BootROM handshake skipped
+- Native handle: 0
+
+Successful reads
+- Platform: MT6789
+- SoftwareVersion: alps-mp-s0.mp1.rc-V17.23_reallytek.s0mp1rc.k61v1.64.bsp_P24
+- BuildDate: Thu Sep  4 13:04:01 CST 2025
+- ChipID: <REDACTED_HEX_IDENTIFIER>
+- Current modem index: 0
+- Connection info: 0, 1
+- SP modem capability: result 0; confirmation values 2, 2
+- SP current modem type: result 0; type value 9
+- SP modem query info: result 0; confirmation values 1, 1
+- SP MD image type: result 0; image type value 12
+- SP modem mode: result 0; mode value 0
+- SP modem download status: result 0; status value 0
+- SP MD database path: result 0; /data/vendor_de/meta/mddb
+- SP AP database path: result 0; vendor/etc/apdb
+
+Partially available
+- SP modem state: result 1; confirmation began with modem type value 9
+- SP modem EE info: result 1; confirmation included /data/vendor_de/meta/mddb followed by opaque state data
+
+Modem bridge
+- Native function: META_ConnectModem_r
+- Separate native modem handle 1 allocated with META_GetAvailableHandle and initialized with META_Init_r
+- Native CShare existing-AP transport selected with request offset 0x24 = 2
+- Result: 2
+- Separate MD/NVRAM bridge was not valid; MD database-backed getters remain blocked
+- META_Deinit_r cleanup succeeded for the isolated modem handle
+
+Unblocked read-only diagnostics
+- META_QueryCurrentModemType_r: not exported by this D2G MetaCore build
+- META_GetModemVersionInfo_r: result 2, empty result
+- META_MISC_GetBarCodeValue_r: result 2, empty result
+- META_MISC_GetIMEIRecNum_r: result 2, empty result
+- META_MISC_GetIMEILocation_r: result 2, empty result
+- META_MISC_GetCalFlagEnum_r: result 2, empty result
+- META_MISC_GetRfCalEnvEnum_r: result 2, empty result
+- SP-native modem inventory functions succeeded directly through the AP handle
+
+Decision
+- Existing-META AP transport is valid and repeatable.
+- SP-native modem inventory service is available through the AP handle.
+- Separate MD/NVRAM service is not connected through the isolated native modem handle.
+- Do not call additional PSN, IMEI, MAC, calibration, or NVRAM getters yet.
+- Device-reported MD database path is /data/vendor_de/meta/mddb.
+- Device-reported AP database path is vendor/etc/apdb.
+- Next stage is recovery of a proven database-loading/read contract or separate MD service connector.
+
+Wrapper isolation test
+- Native AP session was validated and fully released first.
+- Secondary MTK_Functions existing-META attach was attempted for dedicated AP PSN read.
+- Wrapper attach did not return within 30 seconds and was terminated.
+- COM15 remained healthy; no wrapper getter was called.
+
+Not executed
+- PSN / barcode
+- IMEI
+- BT MAC / Wi-Fi MAC
+- calibration / factory flags
+- arbitrary NVRAM reads
+- shell/getprop
+
+Reason
+The remaining values are NVRAM/database-backed. Native read exports exist, but require the correct AP/BP database, LID/record IDs, and proven request structures. Calling them without those contracts is blind NVRAM access. MDMeta_ReadWrite_CalFtFlag is excluded because its mode is ambiguous and can write.
+
+Latest audit
+- audit_shared_runtime/D4_NATIVE_METACORE_TargetVerInfo_None_20260612_200637/stdout.txt
+- audit_shared_runtime/D4_NATIVE_METACORE_TargetVerInfo_APPSN_20260613_003943/stdout.txt
+- audit_shared_runtime/D4_NATIVE_METACORE_TargetVerInfo_None_20260613_004315/stdout.txt
+
+Safety verification
+- No NVRAM write
+- No reset / FactoryReset / FRP / format / unlock / reboot
+- No shell
+- No MTK_Functions wrapper loaded
+- Dedicated modem-version and AP-side barcode getters were read-only tests and both returned 2 with empty results
+- SP-native modem capability/type/info/image/mode/status/database-path reads succeeded
+- Native disconnect and deinit succeeded
+
+
