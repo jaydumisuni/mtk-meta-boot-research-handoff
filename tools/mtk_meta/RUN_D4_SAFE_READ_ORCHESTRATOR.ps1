@@ -17,6 +17,7 @@ function Write-Step([string]$Text) { Write-Host "`n=== $Text ===" -ForegroundCol
 function Write-Ok([string]$Text) { Write-Host $Text -ForegroundColor Green }
 function Write-Warn([string]$Text) { Write-Host $Text -ForegroundColor Yellow }
 function Write-Bad([string]$Text) { Write-Host $Text -ForegroundColor Red }
+function Quote-Arg([string]$Value) { '"' + ($Value -replace '"','\"') + '"' }
 
 function Find-ProjectRoot {
   $dir = (Resolve-Path ".").Path
@@ -114,21 +115,21 @@ function Invoke-D4Mode {
   $stdout = Join-Path $AuditRoot ("{0}_stdout.txt" -f $Label)
   $stderr = Join-Path $AuditRoot ("{0}_stderr.txt" -f $Label)
 
-  $args = @(
+  $argList = @(
     "-NoProfile",
     "-ExecutionPolicy", "Bypass",
     "-File", $Runner,
     "-VendorRead", $VendorRead,
     "-NativeRead", $NativeRead,
     "-DiagnosticRead", $DiagnosticRead,
-    "-ProbeTimeoutSeconds", $ProbeTimeoutSeconds
+    "-ProbeTimeoutSeconds", [string]$ProbeTimeoutSeconds
   )
-  if ($BuildOnly) { $args += "-BuildOnly" }
+  if ($BuildOnly) { $argList += "-BuildOnly" }
 
   $psi = New-Object System.Diagnostics.ProcessStartInfo
   $psi.FileName = "powershell.exe"
   $psi.WorkingDirectory = $ProjectRoot
-  foreach ($a in $args) { [void]$psi.ArgumentList.Add($a) }
+  $psi.Arguments = (($argList | ForEach-Object { Quote-Arg ([string]$_) }) -join " ")
   $psi.UseShellExecute = $false
   $psi.RedirectStandardOutput = $true
   $psi.RedirectStandardError = $true
