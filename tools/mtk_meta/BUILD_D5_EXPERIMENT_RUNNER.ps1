@@ -36,33 +36,36 @@ function New-D5ExperimentRunner {
     return $exportReplacement
   }, 1)
 
-  $requestAnchor = (@(
-    '   *(int*)&modemReq[0x24]=2;',
-    '   printf("[bridge-request] offset24=2 (native CShare existing-AP transport)\n");'
-  ) -join "`n") + "`n"
-  $requestReplacement = (@(
-    '   int bridgeRequestValue=2;',
-    '   const char* bridgeRequestSource="$BridgeRequestSource";',
-    '   if(strcmp(bridgeRequestSource,"Zero")==0)bridgeRequestValue=0;',
-    '   else if(strcmp(bridgeRequestSource,"CurrentModem")==0)bridgeRequestValue=currentModem;',
-    '   else if(strcmp(bridgeRequestSource,"CurrentModemType")==0)bridgeRequestValue=(int)currentModemType;',
-    '   else if(strcmp(bridgeRequestSource,"ConnectionInfo0")==0)bridgeRequestValue=connectionInfo0;',
-    '   else if(strcmp(bridgeRequestSource,"ConnectionInfo1")==0)bridgeRequestValue=connectionInfo1;',
-    '   int bridgeRequestUsable=(bridgeRequestValue>=0&&bridgeRequestValue<=32)?1:0;',
-    '   if(bridgeRequestUsable)*(int*)&modemReq[0x24]=bridgeRequestValue;',
-    '   printf("[bridge-request] source=%s value=%d usable=%d offset24\n",bridgeRequestSource,bridgeRequestValue,bridgeRequestUsable);'
-  ) -join "`n") + "`n"
-  if (!$source.Contains($requestAnchor)) {
-    throw "D4 runner bridge-request anchor changed; D5 patch refused."
+  $requestPattern = '(?m)^(?<indent>\s*)\*\(int\*\)&modemReq\[0x24\]=2;\s*\n\s*printf\("\[bridge-request\] offset24=2 \(native CShare existing-AP transport\)\\n"\);\s*$'
+  $requestMatches = [regex]::Matches($source, $requestPattern)
+  if ($requestMatches.Count -ne 1) {
+    throw "D4 runner bridge-request anchor changed or is ambiguous; D5 patch refused."
   }
-  $source = $source.Replace($requestAnchor, $requestReplacement)
+  $requestIndent = $requestMatches[0].Groups['indent'].Value
+  $requestReplacement = @(
+    "${requestIndent}int bridgeRequestValue=2;",
+    "${requestIndent}const char* bridgeRequestSource=`"$BridgeRequestSource`";",
+    "${requestIndent}if(strcmp(bridgeRequestSource,`"Zero`")==0)bridgeRequestValue=0;",
+    "${requestIndent}else if(strcmp(bridgeRequestSource,`"CurrentModem`")==0)bridgeRequestValue=currentModem;",
+    "${requestIndent}else if(strcmp(bridgeRequestSource,`"CurrentModemType`")==0)bridgeRequestValue=(int)currentModemType;",
+    "${requestIndent}else if(strcmp(bridgeRequestSource,`"ConnectionInfo0`")==0)bridgeRequestValue=connectionInfo0;",
+    "${requestIndent}else if(strcmp(bridgeRequestSource,`"ConnectionInfo1`")==0)bridgeRequestValue=connectionInfo1;",
+    "${requestIndent}int bridgeRequestUsable=(bridgeRequestValue>=0&&bridgeRequestValue<=32)?1:0;",
+    "${requestIndent}if(bridgeRequestUsable)*(int*)&modemReq[0x24]=bridgeRequestValue;",
+    "${requestIndent}printf(`"[bridge-request] source=%s value=%d usable=%d offset24\n`",bridgeRequestSource,bridgeRequestValue,bridgeRequestUsable);"
+  ) -join "`n"
+  $source = [regex]::Replace($source, $requestPattern, [System.Text.RegularExpressions.MatchEvaluator]{
+    param($match)
+    return $requestReplacement
+  }, 1)
 
-  $connectAnchor = '__try{modemConnectRet=(modemInitRet==0&&ConnectModem)?ConnectModem(modemHandle,modemReq,modemReport):-1;printf("[ret] ConnectModem=%d report=",modemConnectRet);PrintHex("ModemConnectReport",modemReport,32);}__except(EXCEPTION_EXECUTE_HANDLER){printf("[exception] ConnectModem=0x%08lX\n",GetExceptionCode());}'
-  $connectReplacement = '__try{modemConnectRet=(bridgeRequestUsable&&modemInitRet==0&&ConnectModem)?ConnectModem(modemHandle,modemReq,modemReport):-1;printf("[ret] ConnectModem=%d report=",modemConnectRet);PrintHex("ModemConnectReport",modemReport,32);}__except(EXCEPTION_EXECUTE_HANDLER){printf("[exception] ConnectModem=0x%08lX\n",GetExceptionCode());}'
-  if (!$source.Contains($connectAnchor)) {
-    throw "D4 runner ConnectModem anchor changed; D5 patch refused."
+  $connectNeedle = 'modemConnectRet=(modemInitRet==0&&ConnectModem)?ConnectModem(modemHandle,modemReq,modemReport)'
+  $connectReplacement = 'modemConnectRet=(bridgeRequestUsable&&modemInitRet==0&&ConnectModem)?ConnectModem(modemHandle,modemReq,modemReport)'
+  $connectMatches = [regex]::Matches($source, [regex]::Escape($connectNeedle))
+  if ($connectMatches.Count -ne 1) {
+    throw "D4 runner ConnectModem anchor changed or is ambiguous; D5 patch refused."
   }
-  $source = $source.Replace($connectAnchor, $connectReplacement)
+  $source = $source.Replace($connectNeedle, $connectReplacement)
   $source = $source.Replace(
     "D4 native MetaCore existing-META only",
     "D5 native MetaCore selector experiment"
