@@ -1,8 +1,13 @@
 .github/workflows/d5-read-only-ci.yml
+.github/workflows/srg-d5-postmerge-review.yml
 .gitignore
 README.md
 RUN_D5_META_RESEARCH.ps1
+pyproject.toml
 reports/D5_META_INVESTIGATION_PROTOCOL.md
+reviews/d5/README.md
+reviews/d5/SRG_ADJUDICATION.md
+reviews/d5/pr1_changed_files.txt
 schemas/meta_campaign_findings.schema.json
 tests/test_meta_investigator.py
 tools/mtk_meta/BUILD_D5_EXPERIMENT_RUNNER.ps1
