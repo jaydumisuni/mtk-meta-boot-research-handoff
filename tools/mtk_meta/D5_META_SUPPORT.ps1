@@ -98,7 +98,7 @@ function Invoke-CapturedProcess {
   $stderrTask.GetAwaiter().GetResult() | Set-Content $StderrPath -Encoding UTF8
   $ended = Get-Date
   return [pscustomobject]@{
-    ExitCode = if ($timedOut) { -2 } else { $process.ExitCode }
+    ExitCode = $(if ($timedOut) { -2 } else { $process.ExitCode })
     TimedOut = $timedOut
     DurationSeconds = [Math]::Round(($ended - $started).TotalSeconds, 3)
     StartedAt = $started.ToUniversalTime().ToString("o")
@@ -157,17 +157,25 @@ function Start-MetaBootCampaign {
   $existing = Get-MetaPort
   if ($existing) {
     return [pscustomobject]@{
-      success=$true; existing_meta=$true
-      pid_2000_observed=[bool](@($before | Where-Object { $_.Pid2000 }).Count)
-      pid_2007_observed=$true; elapsed_seconds=0.0; attempts=@(); port=$existing
+      success = $true
+      existing_meta = $true
+      pid_2000_observed = [bool](@($before | Where-Object { $_.Pid2000 }).Count)
+      pid_2007_observed = $true
+      elapsed_seconds = 0.0
+      attempts = @()
+      port = $existing
     }
   }
   if (!$BootIfNeeded) {
     return [pscustomobject]@{
-      success=$false; existing_meta=$false
-      pid_2000_observed=[bool](@($before | Where-Object { $_.Pid2000 }).Count)
-      pid_2007_observed=$false; elapsed_seconds=0.0; attempts=@(); port=$null
-      reason="PID_2007 not present and -BootIfNeeded was not supplied."
+      success = $false
+      existing_meta = $false
+      pid_2000_observed = [bool](@($before | Where-Object { $_.Pid2000 }).Count)
+      pid_2007_observed = $false
+      elapsed_seconds = 0.0
+      attempts = @()
+      port = $null
+      reason = "PID_2007 not present and -BootIfNeeded was not supplied."
     }
   }
 
@@ -186,28 +194,39 @@ function Start-MetaBootCampaign {
     $port = Wait-ForMetaPort $MetaWaitSeconds
     $attemptAfter = @(Get-MtkPnpSnapshot)
     $attempts += [pscustomobject]@{
-      attempt=$attempt; started_at=$process.StartedAt; ended_at=$process.EndedAt
-      duration_seconds=$process.DurationSeconds; exit_code=$process.ExitCode
-      timed_out=$process.TimedOut; success=[bool]$port
-      before=$attemptBefore; after=$attemptAfter; stdout=$stdout; stderr=$stderr
+      attempt = $attempt
+      started_at = $process.StartedAt
+      ended_at = $process.EndedAt
+      duration_seconds = $process.DurationSeconds
+      exit_code = $process.ExitCode
+      timed_out = $process.TimedOut
+      success = [bool]$port
+      before = $attemptBefore
+      after = $attemptAfter
+      stdout = $stdout
+      stderr = $stderr
     }
     if ($port) {
       return [pscustomobject]@{
-        success=$true; existing_meta=$false
-        pid_2000_observed=[bool](@(($before+$attemptBefore+$attemptAfter) | Where-Object { $_.Pid2000 }).Count)
-        pid_2007_observed=$true
-        elapsed_seconds=[Math]::Round(((Get-Date)-$bootStart).TotalSeconds,3)
-        attempts=$attempts; port=$port
+        success = $true
+        existing_meta = $false
+        pid_2000_observed = [bool](@(($before+$attemptBefore+$attemptAfter) | Where-Object { $_.Pid2000 }).Count)
+        pid_2007_observed = $true
+        elapsed_seconds = [Math]::Round(((Get-Date)-$bootStart).TotalSeconds,3)
+        attempts = $attempts
+        port = $port
       }
     }
     Start-Sleep -Seconds 2
   }
   return [pscustomobject]@{
-    success=$false; existing_meta=$false
-    pid_2000_observed=[bool](@($before | Where-Object { $_.Pid2000 }).Count)
-    pid_2007_observed=$false
-    elapsed_seconds=[Math]::Round(((Get-Date)-$bootStart).TotalSeconds,3)
-    attempts=$attempts; port=$null
-    reason="All META boot attempts completed without PID_2007."
+    success = $false
+    existing_meta = $false
+    pid_2000_observed = [bool](@($before | Where-Object { $_.Pid2000 }).Count)
+    pid_2007_observed = $false
+    elapsed_seconds = [Math]::Round(((Get-Date)-$bootStart).TotalSeconds,3)
+    attempts = $attempts
+    port = $null
+    reason = "All META boot attempts completed without PID_2007."
   }
 }
