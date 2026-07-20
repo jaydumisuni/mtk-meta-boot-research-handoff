@@ -1,0 +1,154 @@
+name: SRG D5 Post-merge Review
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "pyproject.toml"
+      - ".github/workflows/d5-read-only-ci.yml"
+      - ".github/workflows/srg-d5-postmerge-review.yml"
+      - "RUN_D5_META_RESEARCH.ps1"
+      - "tools/mtk_meta/**"
+      - "tests/**"
+      - "reviews/d5/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: srg-d5-postmerge-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sergeant-review:
+    name: Sergeant independent review
+    runs-on: ubuntu-latest
+    env:
+      SERGEANT_CPL_ENABLED: "true"
+      SERGEANT_CPL_POLICY: preferred
+      SERGEANT_CPL_PROVIDER: auto
+      SERGEANT_CPL_DEPTH: maximum
+      SERGEANT_CPL_MAX_PASSES: "3"
+    steps:
+      - name: Check out review harness
+        uses: actions/checkout@v4
+
+      - name: Check out correction workspace
+        uses: actions/checkout@v4
+        with:
+          repository: jaydumisuni/mtk-meta-boot-research-handoff
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: target-workspace
+
+      - name: Check out pinned Sergeant reviewer
+        uses: actions/checkout@v4
+        with:
+          repository: jaydumisuni/Sergeant
+          ref: 44c8f47f4bb50a73ef3b4d81d7b849a5aab37dfd
+          path: sergeant-workspace
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install pinned Sergeant source
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ./sergeant-workspace
+          python -m pip show sergeant-reviewer
+          python -c "import main_review; print(main_review.__file__)"
+
+      - name: Run independent Sergeant review
+        id: review
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p srg-artifacts
+          git -C target-workspace rev-parse HEAD > srg-artifacts/reviewed-commit.txt
+          git -C sergeant-workspace rev-parse HEAD > srg-artifacts/sergeant-commit.txt
+
+          python -m main_review.cli cpl-status --pretty \
+            > srg-artifacts/cpl-status.json \
+            2> srg-artifacts/cpl-status.stderr.txt
+
+          python -m main_review.cli pr-review target-workspace \
+            --file-list reviews/d5/pr1_changed_files.txt \
+            --pretty > srg-artifacts/pr-review.json \
+            2> srg-artifacts/pr-review.stderr.txt
+
+          python -m main_review.cli verify-standard target-workspace \
+            --pretty > srg-artifacts/verify-standard.json \
+            2> srg-artifacts/verify-standard.stderr.txt
+
+          python -m main_review.cli proof-suite target-workspace \
+            --no-fail --pretty > srg-artifacts/proof-suite.json \
+            2> srg-artifacts/proof-suite.stderr.txt
+
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path("srg-artifacts")
+          packet = json.loads((root / "pr-review.json").read_text(encoding="utf-8"))
+          verification = json.loads((root / "verify-standard.json").read_text(encoding="utf-8"))
+          reviewed_commit = (root / "reviewed-commit.txt").read_text(encoding="utf-8").strip()
+          sergeant_commit = (root / "sergeant-commit.txt").read_text(encoding="utf-8").strip()
+          verdict = packet.get("verdict", {})
+          raw = str(verdict.get("verdict", "UNKNOWN"))
+          mapped = {
+              "APPROVE": "PASS",
+              "COMMENT": "NEEDS WORK",
+              "REQUEST_CHANGES": "BLOCK",
+          }.get(raw, "BLOCK")
+          actions = [str(item) for item in verdict.get("required_actions", [])]
+          summary = [
+              "# Sergeant D5 Correction Review",
+              "",
+              f"- Reviewed commit: `{reviewed_commit}`",
+              f"- Sergeant commit: `{sergeant_commit}`",
+              f"- Sergeant verdict: **{raw}**",
+              f"- TTG gate: **{mapped}**",
+              f"- Confidence: **{verdict.get('confidence', 0)}**",
+              f"- Reason: {verdict.get('reason', '')}",
+              f"- Verification standard: **{verification.get('status')}**",
+              "",
+              "## Required actions",
+          ]
+          summary.extend(f"- {item}" for item in actions)
+          if not actions:
+              summary.append("- None")
+          summary.extend([
+              "",
+              "## Evidence status",
+              f"- Repository: {packet.get('repository_review', {}).get('verdict')}",
+              f"- Diff: {packet.get('diff_review', {}).get('verdict')}",
+              f"- Capability: {packet.get('capability_review', {}).get('verdict')}",
+              f"- Review intelligence: {packet.get('review_intelligence', {}).get('verdict')}",
+              f"- Cpl status: {packet.get('cpl_review', {}).get('status')}",
+              f"- Officer council: {packet.get('officer_council', {}).get('verdict')}",
+          ])
+          text = "\n".join(summary) + "\n"
+          (root / "SRG_REVIEW_SUMMARY.md").write_text(text, encoding="utf-8")
+          Path(os.environ["GITHUB_STEP_SUMMARY"]).write_text(text, encoding="utf-8")
+          Path(os.environ["GITHUB_OUTPUT"]).write_text(
+              f"raw_verdict={raw}\nttg_gate={mapped}\n", encoding="utf-8"
+          )
+          PY
+
+      - name: Upload complete Sergeant evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: srg-d5-postmerge-review
+          path: srg-artifacts/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Enforce Sergeant gate
+        if: always()
+        shell: bash
+        run: |
+          test "${{ steps.review.outputs.ttg_gate }}" = "PASS"

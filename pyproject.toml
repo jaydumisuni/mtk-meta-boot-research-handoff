@@ -1,0 +1,16 @@
+[project]
+name = "ttg-mtk-meta-research-handoff"
+version = "0.1.0"
+description = "Sanitized MTK META boot and existing-META read-only research handoff"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Research handoff; see repository terms" }
+authors = [
+  { name = "THETECHGUY DIGITAL SOLUTIONS" }
+]
+
+[tool.setuptools]
+py-modules = []
+
+[tool.unittest]
+start-directory = "tests"

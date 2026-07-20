@@ -91,7 +91,11 @@ function Invoke-CapturedProcess {
   $timedOut = $false
   if (!$process.WaitForExit($TimeoutSeconds * 1000)) {
     $timedOut = $true
-    try { $process.Kill() } catch {}
+    try {
+      & taskkill.exe /PID $process.Id /T /F 2>$null | Out-Null
+    } catch {
+      try { $process.Kill() } catch {}
+    }
   }
   try { $process.WaitForExit() } catch {}
   $stdoutTask.GetAwaiter().GetResult() | Set-Content $StdoutPath -Encoding UTF8
@@ -139,11 +143,25 @@ function Ensure-MtkClientMetaMode([string]$ResolvedProjectRoot) {
   return @{ Python=$venvPython; MtkPy=$mtkPy.FullName; WorkingDirectory=$mtkDir }
 }
 
-function Wait-ForMetaPort([int]$Seconds) {
+function Wait-ForMetaPort([int]$Seconds, [int]$StablePolls = 2) {
   $deadline = (Get-Date).AddSeconds($Seconds)
+  $lastKey = ""
+  $stableCount = 0
   do {
     $port = Get-MetaPort
-    if ($port) { return $port }
+    if ($port) {
+      $key = "$($port.Pid)|$($port.ComPort)|$($port.Name)"
+      if ($key -eq $lastKey) {
+        $stableCount++
+      } else {
+        $lastKey = $key
+        $stableCount = 1
+      }
+      if ($stableCount -ge $StablePolls) { return $port }
+    } else {
+      $lastKey = ""
+      $stableCount = 0
+    }
     Start-Sleep -Milliseconds 750
   } while ((Get-Date) -lt $deadline)
   return $null
@@ -154,7 +172,7 @@ function Start-MetaBootCampaign {
   $bootStart = Get-Date
   $attempts = @()
   $before = @(Get-MtkPnpSnapshot)
-  $existing = Get-MetaPort
+  $existing = Wait-ForMetaPort 3
   if ($existing) {
     return [pscustomobject]@{
       success = $true
@@ -227,6 +245,6 @@ function Start-MetaBootCampaign {
     elapsed_seconds = [Math]::Round(((Get-Date)-$bootStart).TotalSeconds,3)
     attempts = $attempts
     port = $null
-    reason = "All META boot attempts completed without PID_2007."
+    reason = "All META boot attempts completed without a stable PID_2007 port."
   }
 }
