@@ -63,8 +63,8 @@ def main() -> int:
         "-Shell",
         "-Reboot",
     }
-    if any(token in campaign for token in forbidden_cli_tokens):
-        fail("D5 runner gained a destructive command-line option")
+    if any(token in combined for token in forbidden_cli_tokens):
+        fail("D5 support, campaign, or generated-runner builder gained a destructive command-line option")
 
     allowed_publication_files = {
         "campaign_findings.json",
