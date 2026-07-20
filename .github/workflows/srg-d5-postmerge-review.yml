@@ -46,6 +46,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install sergeant-reviewer==0.4.0
           python -m pip show sergeant-reviewer
+          python -c "import main_review; print(main_review.__file__)"
 
       - name: Run independent Sergeant review
         id: review
@@ -53,14 +54,23 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p srg-artifacts
-          sergeant cpl-status --pretty > srg-artifacts/cpl-status.json
-          sergeant pr-review target-workspace \
+
+          python -m main_review.cli cpl-status --pretty \
+            > srg-artifacts/cpl-status.json \
+            2> srg-artifacts/cpl-status.stderr.txt
+
+          python -m main_review.cli pr-review target-workspace \
             --file-list reviews/d5/pr1_changed_files.txt \
-            --pretty > srg-artifacts/pr-review.json
-          sergeant verify-standard target-workspace \
-            --pretty > srg-artifacts/verify-standard.json
-          sergeant proof-suite target-workspace \
-            --no-fail --pretty > srg-artifacts/proof-suite.json
+            --pretty > srg-artifacts/pr-review.json \
+            2> srg-artifacts/pr-review.stderr.txt
+
+          python -m main_review.cli verify-standard target-workspace \
+            --pretty > srg-artifacts/verify-standard.json \
+            2> srg-artifacts/verify-standard.stderr.txt
+
+          python -m main_review.cli proof-suite target-workspace \
+            --no-fail --pretty > srg-artifacts/proof-suite.json \
+            2> srg-artifacts/proof-suite.stderr.txt
 
           python - <<'PY'
           import json
