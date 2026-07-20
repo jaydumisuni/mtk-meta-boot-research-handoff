@@ -43,7 +43,7 @@ def main() -> int:
 
     if '@($boot.MtkPy, "meta", "METAMETA")' not in combined:
         fail("boot helper invocation changed from the allowlisted META command")
-    if 'write_allowed = $false' not in campaign:
+    if re.search(r"write_allowed\s*=\s*\$false", campaign) is None:
         fail("raw campaign no longer fixes write_allowed=false")
     if 'unknown ABI functions are NOT called' not in combined:
         fail("unknown connector no-call guard is missing")
