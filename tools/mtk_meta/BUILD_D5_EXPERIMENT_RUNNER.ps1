@@ -44,7 +44,7 @@ function New-D5ExperimentRunner {
   $requestIndent = $requestMatches[0].Groups['indent'].Value
   $requestReplacement = @(
     "${requestIndent}int bridgeRequestValue=2;",
-    "${requestIndent}const char* bridgeRequestSource=`"$BridgeRequestSource`";",
+    "${requestIndent}const char* bridgeRequestSource=`"`$BridgeRequestSource`";",
     "${requestIndent}if(strcmp(bridgeRequestSource,`"Zero`")==0)bridgeRequestValue=0;",
     "${requestIndent}else if(strcmp(bridgeRequestSource,`"CurrentModem`")==0)bridgeRequestValue=currentModem;",
     "${requestIndent}else if(strcmp(bridgeRequestSource,`"CurrentModemType`")==0)bridgeRequestValue=(int)currentModemType;",
