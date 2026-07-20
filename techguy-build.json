@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "projectName": "TTG META Lab",
+  "projectType": "python-qt",
+  "output": "dist-exe",
+  "maintenance": {
+    "enabled": true,
+    "tool_id": "ttg-meta-lab",
+    "display_name": "TTG META Lab",
+    "channel": "dev",
+    "version": "0.1.0-dev.1",
+    "entry_executable": "TTG-Meta-Lab.exe",
+    "output_directory": "dist-exe",
+    "dev_repository": "jaydumisuni/tools-test-repo",
+    "production_repository": "jaydumisuni/mtk-meta-boot-research-handoff",
+    "check_on_launch": true,
+    "auto_apply": true,
+    "check_timeout_seconds": 10,
+    "early_health_seconds": 10,
+    "keep_rollback": true,
+    "require_authenticode": false,
+    "hunter": {
+      "enabled": false,
+      "endpoint": "",
+      "route": "ttg-meta-lab"
+    },
+    "reporting": {
+      "enabled": true,
+      "github_direct_when_authenticated": true,
+      "github_repository": "jaydumisuni/tools-test-repo",
+      "privacy_profile": "strict"
+    }
+  }
+}
