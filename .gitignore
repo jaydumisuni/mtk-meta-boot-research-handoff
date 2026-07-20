@@ -6,10 +6,13 @@
 *.lib
 *.exp
 APDB_*
+MDDB_*
+BPLGUInfoCustomAppSrcP_*
 *_ENUM
 bin/
 MtkCoreDlls*/
 MTKDLLs/
 Objects/
 *.zip
-
+audit_shared_runtime/
+raw_campaigns/
