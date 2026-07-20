@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://thetechguyds.com/schemas/ttg-mtk-meta-campaign-findings-v1.json",
+  "title": "TTG MTK META campaign findings",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "analyzer_version",
+    "campaign_id",
+    "research_mode",
+    "write_allowed",
+    "verdict",
+    "confidence",
+    "boot",
+    "runs",
+    "specialists",
+    "hypotheses"
+  ],
+  "properties": {
+    "schema_version": { "const": "ttg.mtk-meta.campaign-findings.v1" },
+    "analyzer_version": { "type": "string" },
+    "campaign_id": { "type": "string", "minLength": 1 },
+    "created_at": { "type": "string" },
+    "research_mode": { "const": "read_only" },
+    "write_allowed": { "const": false },
+    "verdict": {
+      "enum": [
+        "META_BOOT_NOT_CERTIFIED",
+        "META_BOOT_CERTIFIED__AP_ATTACH_UNSTABLE",
+        "META_BOOT_AND_AP_ATTACH_CERTIFIED__MD_SERVICE_INVESTIGATE",
+        "MD_SERVICE_RESOLVED_READ_ONLY"
+      ]
+    },
+    "confidence": {
+      "type": "object",
+      "additionalProperties": { "type": "number", "minimum": 0, "maximum": 1 }
+    },
+    "boot": { "type": "object" },
+    "runs": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "required": ["run_id", "label", "bridge_source", "dimensions", "return_codes"],
+        "properties": {
+          "run_id": { "type": "string" },
+          "label": { "type": "string" },
+          "bridge_source": { "type": "string" },
+          "bridge_value": { "type": ["integer", "null"] },
+          "dimensions": { "type": "object" },
+          "return_codes": { "type": "object" },
+          "sanitized_excerpt": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "specialists": { "type": "array", "items": { "type": "object" } },
+    "hypotheses": { "type": "array", "items": { "type": "object" } },
+    "next_focus": { "type": "string" }
+  },
+  "additionalProperties": true
+}

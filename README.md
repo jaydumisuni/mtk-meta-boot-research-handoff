@@ -1,23 +1,25 @@
 # MTK META Boot / Existing-META Read-Only Research Handoff
 
-Sanitized research bundle generated on 2026-06-18 16:35:33 +02:00.
+Sanitized research bundle generated on 2026-06-18 16:35:33 +02:00 and extended with the D5 automated investigation loop.
 
-Purpose: preserve the D2/D3/D4 MTK META boot and existing-META attach research so another ChatGPT/Codex session can continue from GitHub.
+Purpose: preserve and advance the D2/D3/D4/D5 MTK META boot, existing-META attach, and MD/NVRAM service research so another ChatGPT/Codex session can continue directly from GitHub.
 
 ## What Is Included
 
 - `scripts/`: runnable PowerShell probe generators for D2, D3, and D4 stages.
-- `tools/mtk_meta/`: project-root helpers that can be copied/pulled into the real TGT ATO workspace.
-- `reports/`: curated handoff notes, safety rules, export maps, and read-only inventory reports.
-- `audit_logs/`: selected stdout/summary evidence from the successful D4 native existing-META runs.
+- `tools/mtk_meta/`: project-root helpers plus the D5 five-run campaign, analyzer, and publisher.
+- `reports/`: curated handoff notes, safety rules, export maps, and investigation protocols.
+- `audit_logs/`: selected sanitized evidence from successful read-only runs.
 - `generated_sources/`: generated x86 C++ source from the latest D4 runner for ABI review.
+- `schemas/`: versioned evidence contracts.
 
 ## What Is Excluded
 
 - Vendor DLLs and EXEs.
 - Object files and compiled probes.
-- Downloaded APDB files from the device.
-- Raw unique device identifiers; serials and chip IDs are redacted.
+- Downloaded APDB/MDDB files.
+- Raw unique device identifiers.
+- Raw D5 campaign logs.
 - Any destructive operation output.
 
 ## Current Technical State
@@ -25,57 +27,74 @@ Purpose: preserve the D2/D3/D4 MTK META boot and existing-META attach research s
 - Existing META attach via native `SP_META_ConnectInMetaModeByUSB` on VID_0E8D PID_2007 succeeded.
 - Read-only `SP_META_GetTargetVerInfo_r` and `SP_META_GetChipID_r` succeeded.
 - SP modem inventory functions through the AP handle succeeded for capability/type/info/image/mode/status/database paths.
-- Device APDB directory was enumerated and matched APDB filenames were identified; APDB binaries are not included here.
-- `SP_META_NVRAM_Init_r` accepted the matched local APDB, but identifier getters still returned result `2` in the previous run.
-- Separate MD/NVRAM service connector is still the unresolved part. The next focus is native `META_ConnectWithMultiModeTarget_r` / `META_Connect_Ex_Req` recovery.
+- Device APDB inventory and host-side NVRAM initialization were reached.
+- The separate MD/NVRAM service connector remains the focused unresolved part.
+- D5 now compares five evidence-backed bridge selector hypotheses rather than repeating one hard-coded request.
 
-## Important Correction
+## One-command D5 campaign
 
-`jaydumisuni/mtkclient-meta-mode` is not the read test path. It is only the proven META boot helper. The read path remains this handoff repo's D4 MetaCore runner.
-
-Use it like this:
-
-1. `mtkclient-meta-mode` boots the phone to META when PID_2007 is not already present.
-2. `RUN_D4_NATIVE_METACORE_EXISTING_META.ps1` attaches to the already booted PID_2007 META port and performs read-only inventory.
-3. `tools/mtk_meta/RUN_D4_SAFE_READ_ORCHESTRATOR.ps1` ties those two together from the real project root.
-
-## Pull + Test Command
-
-From the real TGT ATO project root, after pulling this repo into the workspace:
+Pull this repository, then run:
 
 ```powershell
-cd "D:\projects\in progress\TGT ATO iDiot proof"
-powershell -ExecutionPolicy Bypass -File .\tools\mtk_meta\RUN_D4_SAFE_READ_ORCHESTRATOR.ps1
+powershell -ExecutionPolicy Bypass -File .\RUN_D5_META_RESEARCH.ps1 `
+  -ProjectRoot "D:\projects\in progress\TGT ATO iDiot proof"
 ```
 
-If the device is not already in Kernel META PID_2007, let the orchestrator use `mtkclient-meta-mode` only for booting:
+By default this command:
+
+1. detects an existing PID_2007 META port or retries the proven META boot helper up to five times
+2. derives a read-only D5 experiment runner from the current D4 runner
+3. performs five linked selector/database experiments
+4. normalizes evidence with X-Ray-style dimensions
+5. challenges findings with transport/session/database/ABI/modem examiners
+6. ranks H1-H7 hypotheses
+7. redacts identifiers and local paths
+8. pushes only sanitized findings to `evidence/auto`
+
+Useful switches:
+
+```text
+-NoPublish       keep all results local
+-OpenPullRequest open/update the sanitized evidence PR when gh is available
+-PrepareOnly     verify/generate the D5 runner without touching a device
+-NoBoot          require the phone to already be in PID_2007 META
+```
+
+Raw logs remain only under:
+
+```text
+audit_shared_runtime\D5-<UTC timestamp>\
+```
+
+Sanitized repository evidence is indexed at:
+
+```text
+evidence/auto:evidence/latest.json
+evidence/auto:evidence/index.json
+evidence/auto:evidence/campaigns/<campaign-id>/
+```
+
+See [`reports/D5_META_INVESTIGATION_PROTOCOL.md`](reports/D5_META_INVESTIGATION_PROTOCOL.md) for the experiment matrix and evidence contract.
+
+## Older D4 path
+
+`jaydumisuni/mtkclient-meta-mode` is the proven META boot helper. The D4 read path remains:
 
 ```powershell
-cd "D:\projects\in progress\TGT ATO iDiot proof"
 powershell -ExecutionPolicy Bypass -File .\tools\mtk_meta\RUN_D4_SAFE_READ_ORCHESTRATOR.ps1 -BootIfNeeded
 ```
 
-The orchestrator creates an audit folder under:
-
-```text
-audit_shared_runtime\D4_SAFE_READ_ORCHESTRATOR_<timestamp>
-```
-
-Paste back:
-
-- `orchestrator_summary.json`
-- `00_baseline_stdout.txt`
-- `01_database_inventory_stdout.txt`
-- `02_database_acquire_init_stdout.txt`
-- any `native-read-ret`, `database-identifier-ret`, or `vendor-ret` lines
+D5 wraps and extends that evidence chain so console output no longer needs to be copied into chat manually.
 
 ## Safety Lock
 
-Do not run write/reset/destructive functions while continuing this research:
+The research lane remains observation-only:
 
 - No NVRAM write
+- No partition write or erase
 - No FactoryReset
 - No FRP / format / unlock
 - No shell command
-- No reboot/reset
-- No Enable ADB unless explicitly approved after valid read-only handle
+- No reboot/reset command
+- Unknown connector ABIs are inventoried but not called
+- Raw device identifiers and vendor database files are never published
