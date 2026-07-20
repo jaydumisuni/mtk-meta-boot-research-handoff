@@ -1,4 +1,3 @@
-# Read-only code-review scope for merged PR #1.
 .github/workflows/d5-read-only-ci.yml
 .gitignore
 README.md
