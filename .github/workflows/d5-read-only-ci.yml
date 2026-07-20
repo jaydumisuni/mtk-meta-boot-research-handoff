@@ -1,0 +1,79 @@
+name: D5 Read-only CI
+
+on:
+  pull_request:
+    paths:
+      - "RUN_D5_META_RESEARCH.ps1"
+      - "tools/mtk_meta/**"
+      - "tests/**"
+      - "schemas/meta_campaign_findings.schema.json"
+      - "reports/D5_META_INVESTIGATION_PROTOCOL.md"
+      - ".github/workflows/d5-read-only-ci.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "RUN_D5_META_RESEARCH.ps1"
+      - "tools/mtk_meta/**"
+      - "tests/**"
+      - "schemas/meta_campaign_findings.schema.json"
+      - "reports/D5_META_INVESTIGATION_PROTOCOL.md"
+      - ".github/workflows/d5-read-only-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: d5-read-only-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Compile analyzer
+        run: python -m py_compile tools/mtk_meta/meta_investigator.py tools/mtk_meta/check_d5_read_only.py
+      - name: Enforce read-only boundary
+        run: python tools/mtk_meta/check_d5_read_only.py
+      - name: Run fixture tests
+        run: python -m unittest discover -s tests -v
+
+  powershell-parse:
+    name: Windows PowerShell parse
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse D5 scripts without execution
+        shell: powershell
+        run: |
+          $files = @(
+            "RUN_D5_META_RESEARCH.ps1",
+            "tools/mtk_meta/RUN_D5_META_FIVE_RUN_CAMPAIGN.ps1",
+            "tools/mtk_meta/PUBLISH_D5_FINDINGS.ps1"
+          )
+          $failed = $false
+          foreach ($file in $files) {
+            $tokens = $null
+            $errors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile(
+              (Resolve-Path $file),
+              [ref]$tokens,
+              [ref]$errors
+            )
+            if ($errors.Count -gt 0) {
+              $failed = $true
+              Write-Host "Parse errors in $file" -ForegroundColor Red
+              $errors | ForEach-Object { Write-Host $_.Message -ForegroundColor Red }
+            }
+          }
+          if ($failed) { exit 1 }
