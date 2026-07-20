@@ -47,12 +47,21 @@ jobs:
         run: |
           python - <<'PY'
           import json
-          import tomllib
+          import sys
           from pathlib import Path
 
-          with Path("pyproject.toml").open("rb") as stream:
-              project = tomllib.load(stream)
-          assert project["project"]["name"] == "ttg-mtk-meta-research-handoff"
+          manifest_path = Path("pyproject.toml")
+          manifest_text = manifest_path.read_text(encoding="utf-8")
+          if sys.version_info >= (3, 11):
+              import tomllib
+              with manifest_path.open("rb") as stream:
+                  project = tomllib.load(stream)
+              assert project["project"]["name"] == "ttg-mtk-meta-research-handoff"
+          else:
+              assert "[project]" in manifest_text
+              assert 'name = "ttg-mtk-meta-research-handoff"' in manifest_text
+              assert 'requires-python = ">=3.10"' in manifest_text
+
           with Path("schemas/meta_campaign_findings.schema.json").open(encoding="utf-8") as stream:
               schema = json.load(stream)
           assert schema.get("$schema")
@@ -118,14 +127,32 @@ jobs:
           New-Item -ItemType Directory -Force `
             (Join-Path $fixture "app\runtime\support\android\mtk") | Out-Null
 
-          powershell.exe -NoProfile -ExecutionPolicy Bypass `
-            -File .\RUN_D5_META_RESEARCH.ps1 `
-            -ProjectRoot $fixture `
-            -PrepareOnly `
-            -NoPublish `
-            -NoBoot `
-            -SkipHelperUpdate
-          if ($LASTEXITCODE -ne 0) { throw "Prepare-only D5 generation failed." }
+          $stdout = Join-Path $env:RUNNER_TEMP "d5-prepare-stdout.txt"
+          $stderr = Join-Path $env:RUNNER_TEMP "d5-prepare-stderr.txt"
+          $arguments = @(
+            "-NoProfile",
+            "-ExecutionPolicy", "Bypass",
+            "-File", (Resolve-Path ".\RUN_D5_META_RESEARCH.ps1").Path,
+            "-ProjectRoot", $fixture,
+            "-PrepareOnly",
+            "-NoPublish",
+            "-NoBoot",
+            "-SkipHelperUpdate"
+          )
+          $process = Start-Process powershell.exe `
+            -ArgumentList $arguments `
+            -Wait -PassThru `
+            -RedirectStandardOutput $stdout `
+            -RedirectStandardError $stderr
+
+          "===== STDOUT =====" | Set-Content prepare-only-output.txt -Encoding UTF8
+          if (Test-Path $stdout) { Get-Content $stdout | Add-Content prepare-only-output.txt -Encoding UTF8 }
+          "===== STDERR =====" | Add-Content prepare-only-output.txt -Encoding UTF8
+          if (Test-Path $stderr) { Get-Content $stderr | Add-Content prepare-only-output.txt -Encoding UTF8 }
+          Get-Content prepare-only-output.txt | ForEach-Object { Write-Host $_ }
+          if ($process.ExitCode -ne 0) {
+            throw "Prepare-only D5 generation failed with exit $($process.ExitCode)."
+          }
 
           $generated = Get-ChildItem `
             (Join-Path $fixture "audit_shared_runtime") `
@@ -152,7 +179,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: powershell-parse-report
-          path: powershell-parse-report.txt
+          path: |
+            powershell-parse-report.txt
+            prepare-only-output.txt
           if-no-files-found: error
           retention-days: 7
       - name: Fail on PowerShell parse errors
