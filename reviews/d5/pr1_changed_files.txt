@@ -1,0 +1,21 @@
+# Read-only code-review scope for merged PR #1.
+.github/workflows/d5-read-only-ci.yml
+.gitignore
+README.md
+RUN_D5_META_RESEARCH.ps1
+reports/D5_META_INVESTIGATION_PROTOCOL.md
+schemas/meta_campaign_findings.schema.json
+tests/test_meta_investigator.py
+tools/mtk_meta/BUILD_D5_EXPERIMENT_RUNNER.ps1
+tools/mtk_meta/D5_META_SUPPORT.ps1
+tools/mtk_meta/PUBLISH_D5_FINDINGS.ps1
+tools/mtk_meta/RUN_D5_META_FIVE_RUN_CAMPAIGN.ps1
+tools/mtk_meta/check_d5_read_only.py
+tools/mtk_meta/meta_common.py
+tools/mtk_meta/meta_hypotheses.py
+tools/mtk_meta/meta_investigator.py
+tools/mtk_meta/meta_parser.py
+tools/mtk_meta/meta_reasoner.py
+tools/mtk_meta/meta_report.py
+tools/mtk_meta/meta_specialists.py
+tools/mtk_meta/meta_verdict.py
