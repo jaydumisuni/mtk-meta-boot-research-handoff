@@ -3,6 +3,7 @@ name: D5 Read-only CI
 on:
   pull_request:
     paths:
+      - "pyproject.toml"
       - "RUN_D5_META_RESEARCH.ps1"
       - "tools/mtk_meta/**"
       - "tests/**"
@@ -13,6 +14,7 @@ on:
     branches:
       - main
     paths:
+      - "pyproject.toml"
       - "RUN_D5_META_RESEARCH.ps1"
       - "tools/mtk_meta/**"
       - "tests/**"
@@ -41,6 +43,21 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Validate project and evidence manifests
+        run: |
+          python - <<'PY'
+          import json
+          import tomllib
+          from pathlib import Path
+
+          with Path("pyproject.toml").open("rb") as stream:
+              project = tomllib.load(stream)
+          assert project["project"]["name"] == "ttg-mtk-meta-research-handoff"
+          with Path("schemas/meta_campaign_findings.schema.json").open(encoding="utf-8") as stream:
+              schema = json.load(stream)
+          assert schema.get("$schema")
+          print("Project and evidence manifests passed.")
+          PY
       - name: Compile analyzer
         run: python -m py_compile tools/mtk_meta/*.py
       - name: Enforce read-only boundary
@@ -49,7 +66,7 @@ jobs:
         run: python -m unittest discover -s tests -v
 
   powershell-parse:
-    name: Windows PowerShell parse
+    name: Windows PowerShell and prepare-only proof
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -94,7 +111,43 @@ jobs:
           $report | Set-Content powershell-parse-report.txt -Encoding UTF8
           $report | ForEach-Object { Write-Host $_ -ForegroundColor Red }
           exit 1
-      - name: Upload PowerShell parser report
+      - name: Prove prepare-only runner generation
+        shell: powershell
+        run: |
+          $fixture = Join-Path $env:RUNNER_TEMP "d5-fixture"
+          New-Item -ItemType Directory -Force `
+            (Join-Path $fixture "app\runtime\support\android\mtk") | Out-Null
+
+          powershell.exe -NoProfile -ExecutionPolicy Bypass `
+            -File .\RUN_D5_META_RESEARCH.ps1 `
+            -ProjectRoot $fixture `
+            -PrepareOnly `
+            -NoPublish `
+            -NoBoot `
+            -SkipHelperUpdate
+          if ($LASTEXITCODE -ne 0) { throw "Prepare-only D5 generation failed." }
+
+          $generated = Get-ChildItem `
+            (Join-Path $fixture "audit_shared_runtime") `
+            -Recurse -File `
+            -Filter "RUN_D5_NATIVE_METACORE_EXPERIMENT.ps1" |
+            Select-Object -First 1
+          if (!$generated) { throw "Generated D5 experiment runner was not found." }
+
+          $tokens = $null
+          $errors = $null
+          [void][System.Management.Automation.Language.Parser]::ParseFile(
+            $generated.FullName,
+            [ref]$tokens,
+            [ref]$errors
+          )
+          if ($errors.Count -gt 0) {
+            $errors | ForEach-Object { Write-Host $_ -ForegroundColor Red }
+            throw "Generated D5 experiment runner did not parse."
+          }
+          "Prepare-only generated runner passed: $($generated.FullName)" |
+            Add-Content powershell-parse-report.txt -Encoding UTF8
+      - name: Upload PowerShell proof report
         if: always()
         uses: actions/upload-artifact@v4
         with:
