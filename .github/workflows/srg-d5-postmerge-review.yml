@@ -1,0 +1,126 @@
+name: SRG D5 Post-merge Review
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/srg-d5-postmerge-review.yml"
+      - "reviews/d5/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: srg-d5-postmerge-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sergeant-review:
+    name: Sergeant independent review
+    runs-on: ubuntu-latest
+    env:
+      SERGEANT_CPL_ENABLED: "true"
+      SERGEANT_CPL_POLICY: preferred
+      SERGEANT_CPL_PROVIDER: auto
+      SERGEANT_CPL_DEPTH: maximum
+      SERGEANT_CPL_MAX_PASSES: "3"
+    steps:
+      - name: Check out review harness
+        uses: actions/checkout@v4
+
+      - name: Check out the exact merged D5 workspace
+        uses: actions/checkout@v4
+        with:
+          repository: jaydumisuni/mtk-meta-boot-research-handoff
+          ref: 67811cce5e43c021cf27fa73e259759f46e2ae46
+          path: target-workspace
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install pinned Sergeant reviewer
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install sergeant-reviewer==0.4.0
+          python -m pip show sergeant-reviewer
+
+      - name: Run independent Sergeant review
+        id: review
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p srg-artifacts
+          sergeant cpl-status --pretty > srg-artifacts/cpl-status.json
+          sergeant pr-review target-workspace \
+            --file-list reviews/d5/pr1_changed_files.txt \
+            --pretty > srg-artifacts/pr-review.json
+          sergeant verify-standard target-workspace \
+            --pretty > srg-artifacts/verify-standard.json
+          sergeant proof-suite target-workspace \
+            --no-fail --pretty > srg-artifacts/proof-suite.json
+
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path("srg-artifacts")
+          packet = json.loads((root / "pr-review.json").read_text(encoding="utf-8"))
+          verdict = packet.get("verdict", {})
+          raw = str(verdict.get("verdict", "UNKNOWN"))
+          mapped = {
+              "APPROVE": "PASS",
+              "COMMENT": "NEEDS WORK",
+              "REQUEST_CHANGES": "BLOCK",
+          }.get(raw, "BLOCK")
+          actions = [str(item) for item in verdict.get("required_actions", [])]
+          summary = [
+              "# Sergeant D5 Post-merge Review",
+              "",
+              f"- Reviewed commit: `67811cce5e43c021cf27fa73e259759f46e2ae46`",
+              f"- Sergeant verdict: **{raw}**",
+              f"- TTG gate: **{mapped}**",
+              f"- Confidence: **{verdict.get('confidence', 0)}**",
+              f"- Reason: {verdict.get('reason', '')}",
+              "",
+              "## Required actions",
+          ]
+          summary.extend(f"- {item}" for item in actions)
+          if not actions:
+              summary.append("- None")
+          summary.extend([
+              "",
+              "## Evidence status",
+              f"- Repository: {packet.get('repository_review', {}).get('verdict')}",
+              f"- Diff: {packet.get('diff_review', {}).get('verdict')}",
+              f"- Capability: {packet.get('capability_review', {}).get('verdict')}",
+              f"- Review intelligence: {packet.get('review_intelligence', {}).get('verdict')}",
+              f"- Cpl status: {packet.get('cpl_review', {}).get('status')}",
+              f"- Officer council: {packet.get('officer_council', {}).get('verdict')}",
+          ])
+          text = "\n".join(summary) + "\n"
+          (root / "SRG_REVIEW_SUMMARY.md").write_text(text, encoding="utf-8")
+          Path(os.environ["GITHUB_STEP_SUMMARY"]).write_text(text, encoding="utf-8")
+          Path(os.environ["GITHUB_OUTPUT"]).write_text(
+              f"raw_verdict={raw}\nttg_gate={mapped}\n", encoding="utf-8"
+          )
+          PY
+
+      - name: Upload complete Sergeant evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: srg-d5-postmerge-review
+          path: srg-artifacts/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Enforce Sergeant gate
+        if: always()
+        shell: bash
+        run: |
+          test "${{ steps.review.outputs.ttg_gate }}" = "PASS"
