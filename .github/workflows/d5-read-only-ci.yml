@@ -42,7 +42,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Compile analyzer
-        run: python -m py_compile tools/mtk_meta/meta_investigator.py tools/mtk_meta/check_d5_read_only.py
+        run: python -m py_compile tools/mtk_meta/*.py
       - name: Enforce read-only boundary
         run: python tools/mtk_meta/check_d5_read_only.py
       - name: Run fixture tests
@@ -59,6 +59,8 @@ jobs:
           $files = @(
             "RUN_D5_META_RESEARCH.ps1",
             "tools/mtk_meta/RUN_D5_META_FIVE_RUN_CAMPAIGN.ps1",
+            "tools/mtk_meta/D5_META_SUPPORT.ps1",
+            "tools/mtk_meta/BUILD_D5_EXPERIMENT_RUNNER.ps1",
             "tools/mtk_meta/PUBLISH_D5_FINDINGS.ps1"
           )
           $failed = $false
