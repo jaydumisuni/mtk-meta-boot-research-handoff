@@ -80,7 +80,7 @@ if ($LASTEXITCODE -ne 0) { throw "Sanitized publication verification failed." }
 Write-Step "PREPARE EVIDENCE WORKTREE"
 Invoke-Git -WorkingDirectory $ResolvedRepoRoot -Arguments @("fetch", "origin", "--prune") | Out-Null
 $RemoteProbe = Invoke-Git -WorkingDirectory $ResolvedRepoRoot -Arguments @("show-ref", "--verify", "--quiet", "refs/remotes/origin/$EvidenceBranch") -AllowFailure
-$BaseRef = if ($RemoteProbe.ExitCode -eq 0) { "origin/$EvidenceBranch" } else { "origin/main" }
+$BaseRef = $(if ($RemoteProbe.ExitCode -eq 0) { "origin/$EvidenceBranch" } else { "origin/main" })
 $SafeCampaignId = ($CampaignId -replace '[^A-Za-z0-9._-]', '_')
 $Worktree = Join-Path $env:TEMP "ttg-meta-evidence-$SafeCampaignId"
 if (Test-Path $Worktree) { Remove-Item -Recurse -Force $Worktree }
@@ -133,15 +133,16 @@ try {
 
   $ReadmePath = Join-Path $EvidenceRoot "README.md"
   if (!(Test-Path $ReadmePath)) {
-    @"
-# Automated sanitized META evidence
-
-This branch receives sanitized, read-only campaign findings from
-`RUN_D5_META_FIVE_RUN_CAMPAIGN.ps1 -Publish`.
-
-Raw device logs, vendor binaries, downloaded databases, and unique identifiers are never committed.
-Use `latest.json` to locate the newest campaign.
-"@ | Set-Content $ReadmePath -Encoding UTF8
+    $ReadmeLines = @(
+      "# Automated sanitized META evidence",
+      "",
+      "This branch receives sanitized, read-only campaign findings from",
+      '`RUN_D5_META_FIVE_RUN_CAMPAIGN.ps1 -Publish`.',
+      "",
+      "Raw device logs, vendor binaries, downloaded databases, and unique identifiers are never committed.",
+      "Use `latest.json` to locate the newest campaign."
+    )
+    ($ReadmeLines -join "`n") | Set-Content $ReadmePath -Encoding UTF8
   }
 
   Invoke-Git -WorkingDirectory $Worktree -Arguments @("add", "evidence") | Out-Null
