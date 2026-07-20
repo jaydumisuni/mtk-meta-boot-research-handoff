@@ -19,17 +19,22 @@ function New-D5ExperimentRunner {
   }
   $source = $source.Replace($paramAnchor, $paramReplacement)
 
-  $exportAnchor = '  FN_CONNECT_MODEM ConnectModem=(FN_CONNECT_MODEM)r(h,"META_ConnectModem_r");'
-  $exportReplacement = @(
-    '  FN_CONNECT_MODEM ConnectModem=(FN_CONNECT_MODEM)r(h,"META_ConnectModem_r");',
-    '  r(h,"META_ConnectWithMultiModeTarget_r");',
-    '  r(h,"META_Connect_Ex_Req");',
-    '  printf("[connector-inventory] unresolved connector exports are inventoried only; unknown ABI functions are NOT called\n");'
-  ) -join "`n"
-  if (!$source.Contains($exportAnchor)) {
-    throw "D4 runner connector anchor changed; D5 patch refused."
+  $exportPattern = '(?m)^(?<indent>\s*)FN_CONNECT_MODEM ConnectModem=\(FN_CONNECT_MODEM\)r\(h,"META_ConnectModem_r"\);\s*$'
+  $exportMatches = [regex]::Matches($source, $exportPattern)
+  if ($exportMatches.Count -ne 1) {
+    throw "D4 runner connector anchor changed or is ambiguous; D5 patch refused."
   }
-  $source = $source.Replace($exportAnchor, $exportReplacement)
+  $indent = $exportMatches[0].Groups['indent'].Value
+  $exportReplacement = @(
+    "${indent}FN_CONNECT_MODEM ConnectModem=(FN_CONNECT_MODEM)r(h,`"META_ConnectModem_r`");",
+    "${indent}r(h,`"META_ConnectWithMultiModeTarget_r`");",
+    "${indent}r(h,`"META_Connect_Ex_Req`");",
+    "${indent}printf(`"[connector-inventory] unresolved connector exports are inventoried only; unknown ABI functions are NOT called\n`");"
+  ) -join "`n"
+  $source = [regex]::Replace($source, $exportPattern, [System.Text.RegularExpressions.MatchEvaluator]{
+    param($match)
+    return $exportReplacement
+  }, 1)
 
   $requestAnchor = (@(
     '   *(int*)&modemReq[0x24]=2;',
