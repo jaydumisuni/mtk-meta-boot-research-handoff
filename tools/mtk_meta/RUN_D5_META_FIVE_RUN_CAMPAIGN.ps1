@@ -34,9 +34,9 @@ function Invoke-D5Experiment {
   $runRoot = Join-Path $CampaignRoot ("runs\${runId}_$($Experiment.Label)")
   New-Item -ItemType Directory -Force $runRoot | Out-Null
   $before = @(Get-MtkPnpSnapshot)
-  $metaBefore = Get-MetaPort
+  $metaBefore = Wait-ForMetaPort 3
   if (!$metaBefore) {
-    throw "PID_2007 disappeared before run $runId. Rerun with -BootIfNeeded."
+    throw "Stable PID_2007 disappeared before run $runId. Rerun with -BootIfNeeded."
   }
 
   $stdout = Join-Path $runRoot "stdout.txt"
@@ -54,7 +54,7 @@ function Invoke-D5Experiment {
     -ArgumentList $arguments -WorkingDirectory $ResolvedProjectRoot `
     -StdoutPath $stdout -StderrPath $stderr -TimeoutSeconds $RunTimeoutSeconds
   $after = @(Get-MtkPnpSnapshot)
-  $metaAfter = Get-MetaPort
+  $metaAfter = Wait-ForMetaPort 3
   if ($result.ExitCode -eq 0) {
     Write-Ok "Run $runId completed."
   } else {
