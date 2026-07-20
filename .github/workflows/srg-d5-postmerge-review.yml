@@ -55,7 +55,7 @@ jobs:
           set -euo pipefail
           mkdir -p srg-artifacts
 
-          python -m main_review.cli cpl-status --pretty \
+          python -m main_review.cli llm-status --pretty \
             > srg-artifacts/cpl-status.json \
             2> srg-artifacts/cpl-status.stderr.txt
 
