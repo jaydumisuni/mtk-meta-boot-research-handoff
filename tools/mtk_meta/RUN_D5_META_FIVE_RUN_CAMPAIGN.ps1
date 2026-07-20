@@ -42,7 +42,7 @@ function Invoke-D5Experiment {
   $stdout = Join-Path $runRoot "stdout.txt"
   $stderr = Join-Path $runRoot "stderr.txt"
   Write-Step "RUN $runId/05 — $($Experiment.Label)"
-  $args = @(
+  $arguments = @(
     "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $GeneratedRunner,
     "-VendorRead", "None",
     "-NativeRead", $Experiment.NativeRead,
@@ -51,7 +51,7 @@ function Invoke-D5Experiment {
     "-ProbeTimeoutSeconds", [string]$ProbeTimeoutSeconds
   )
   $result = Invoke-CapturedProcess -FilePath "powershell.exe" `
-    -ArgumentList $args -WorkingDirectory $ResolvedProjectRoot `
+    -ArgumentList $arguments -WorkingDirectory $ResolvedProjectRoot `
     -StdoutPath $stdout -StderrPath $stderr -TimeoutSeconds $RunTimeoutSeconds
   $after = @(Get-MtkPnpSnapshot)
   $metaAfter = Get-MetaPort
@@ -62,21 +62,27 @@ function Invoke-D5Experiment {
   }
 
   return [pscustomobject]@{
-    run_id=$runId; label=$Experiment.Label; bridge_source=$Experiment.BridgeSource
-    native_read=$Experiment.NativeRead; diagnostic=$Experiment.Diagnostic
-    exit_code=$result.ExitCode; timed_out=$result.TimedOut
-    duration_seconds=$result.DurationSeconds
-    started_at=$result.StartedAt; ended_at=$result.EndedAt
-    stdout=$stdout; stderr=$stderr
-    port_before=[pscustomobject]@{
-      pid_2007=[bool]$metaBefore
-      com_port=if ($metaBefore) { $metaBefore.ComPort } else { $null }
-      observations=$before
+    run_id = $runId
+    label = $Experiment.Label
+    bridge_source = $Experiment.BridgeSource
+    native_read = $Experiment.NativeRead
+    diagnostic = $Experiment.Diagnostic
+    exit_code = $result.ExitCode
+    timed_out = $result.TimedOut
+    duration_seconds = $result.DurationSeconds
+    started_at = $result.StartedAt
+    ended_at = $result.EndedAt
+    stdout = $stdout
+    stderr = $stderr
+    port_before = [pscustomobject]@{
+      pid_2007 = [bool]$metaBefore
+      com_port = $(if ($metaBefore) { $metaBefore.ComPort } else { $null })
+      observations = $before
     }
-    port_after=[pscustomobject]@{
-      pid_2007=[bool]$metaAfter
-      com_port=if ($metaAfter) { $metaAfter.ComPort } else { $null }
-      observations=$after
+    port_after = [pscustomobject]@{
+      pid_2007 = [bool]$metaAfter
+      com_port = $(if ($metaAfter) { $metaAfter.ComPort } else { $null })
+      observations = $after
     }
   }
 }
@@ -109,32 +115,35 @@ if ($PrepareOnly) {
   exit 0
 }
 
-$Boot = Start-MetaBootCampaign `
-  -ResolvedProjectRoot $ResolvedProjectRoot -CampaignRoot $CampaignRoot
-$Boot | ConvertTo-Json -Depth 10 |
-  Set-Content (Join-Path $CampaignRoot "boot_result.json") -Encoding UTF8
+$Boot = Start-MetaBootCampaign -ResolvedProjectRoot $ResolvedProjectRoot -CampaignRoot $CampaignRoot
+$Boot | ConvertTo-Json -Depth 10 | Set-Content (Join-Path $CampaignRoot "boot_result.json") -Encoding UTF8
 
 if (!$Boot.success) {
   $failureManifest = [ordered]@{
-    schema_version="ttg.mtk-meta.raw-campaign.v1"; campaign_id=$CampaignId
-    created_at=(Get-Date).ToUniversalTime().ToString("o")
-    research_mode="read_only"; write_allowed=$false
-    project_root=$ResolvedProjectRoot; research_repo_root=$ResearchRepoRoot
-    boot=$Boot; runs=@()
+    schema_version = "ttg.mtk-meta.raw-campaign.v1"
+    campaign_id = $CampaignId
+    created_at = (Get-Date).ToUniversalTime().ToString("o")
+    research_mode = "read_only"
+    write_allowed = $false
+    project_root = $ResolvedProjectRoot
+    research_repo_root = $ResearchRepoRoot
+    boot = $Boot
+    runs = @()
   }
-  $failureManifest | ConvertTo-Json -Depth 12 |
-    Set-Content (Join-Path $CampaignRoot "campaign_manifest.json") -Encoding UTF8
+  $failureManifest | ConvertTo-Json -Depth 12 | Set-Content (Join-Path $CampaignRoot "campaign_manifest.json") -Encoding UTF8
   $Python = Resolve-Python
-  & $Python.File @($Python.Prefix) $Analyzer "analyze" `
-    "--campaign" $CampaignRoot "--output" $SanitizedRoot
+  $pythonArguments = @($Python.Prefix) + @(
+    $Analyzer, "analyze", "--campaign", $CampaignRoot, "--output", $SanitizedRoot
+  )
+  & $Python.File @pythonArguments
   if ($Publish -and (Test-Path $Publisher)) {
-    $publishArgs = @(
+    $publishArguments = @(
       "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $Publisher,
       "-CampaignRoot", $CampaignRoot,
       "-ResearchRepoRoot", $ResearchRepoRoot
     )
-    if ($OpenPullRequest) { $publishArgs += "-OpenPullRequest" }
-    & powershell.exe @publishArgs
+    if ($OpenPullRequest) { $publishArguments += "-OpenPullRequest" }
+    & powershell.exe @publishArguments
   }
   throw "META boot was not certified; findings were still analyzed."
 }
@@ -148,38 +157,45 @@ $Experiments = @(
 )
 
 $Runs = @()
-for ($index=1; $index -le $Experiments.Count; $index++) {
+for ($index = 1; $index -le $Experiments.Count; $index++) {
+  $experiment = $Experiments[$index - 1]
   $Runs += Invoke-D5Experiment -ResolvedProjectRoot $ResolvedProjectRoot `
     -GeneratedRunner $GeneratedRunner -CampaignRoot $CampaignRoot `
-    -Index $index -Experiment $Experiments[$index - 1]
+    -Index $index -Experiment $experiment
 }
 
 $Manifest = [ordered]@{
-  schema_version="ttg.mtk-meta.raw-campaign.v1"; campaign_id=$CampaignId
-  created_at=(Get-Date).ToUniversalTime().ToString("o")
-  research_mode="read_only"; write_allowed=$false
-  project_root=$ResolvedProjectRoot; research_repo_root=$ResearchRepoRoot
-  d4_runner=$D4Runner; generated_runner=$GeneratedRunner
-  boot=$Boot; runs=$Runs
+  schema_version = "ttg.mtk-meta.raw-campaign.v1"
+  campaign_id = $CampaignId
+  created_at = (Get-Date).ToUniversalTime().ToString("o")
+  research_mode = "read_only"
+  write_allowed = $false
+  project_root = $ResolvedProjectRoot
+  research_repo_root = $ResearchRepoRoot
+  d4_runner = $D4Runner
+  generated_runner = $GeneratedRunner
+  boot = $Boot
+  runs = $Runs
 }
-$Manifest | ConvertTo-Json -Depth 14 |
-  Set-Content (Join-Path $CampaignRoot "campaign_manifest.json") -Encoding UTF8
+$Manifest | ConvertTo-Json -Depth 14 | Set-Content (Join-Path $CampaignRoot "campaign_manifest.json") -Encoding UTF8
 
 Write-Step "NORMALIZE → CHALLENGE → CERTIFY"
 $Python = Resolve-Python
-& $Python.File @($Python.Prefix) $Analyzer "analyze" `
-  "--campaign" $CampaignRoot "--output" $SanitizedRoot
+$pythonArguments = @($Python.Prefix) + @(
+  $Analyzer, "analyze", "--campaign", $CampaignRoot, "--output", $SanitizedRoot
+)
+& $Python.File @pythonArguments
 if ($LASTEXITCODE -ne 0) { throw "META campaign analysis failed." }
 
 if ($Publish) {
   if (!(Test-Path $Publisher)) { throw "Missing publisher: $Publisher" }
-  $publishArgs = @(
+  $publishArguments = @(
     "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $Publisher,
     "-CampaignRoot", $CampaignRoot,
     "-ResearchRepoRoot", $ResearchRepoRoot
   )
-  if ($OpenPullRequest) { $publishArgs += "-OpenPullRequest" }
-  & powershell.exe @publishArgs
+  if ($OpenPullRequest) { $publishArguments += "-OpenPullRequest" }
+  & powershell.exe @publishArguments
   if ($LASTEXITCODE -ne 0) { throw "Publishing sanitized findings failed." }
 }
 
