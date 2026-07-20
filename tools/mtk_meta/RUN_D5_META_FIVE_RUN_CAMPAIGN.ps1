@@ -41,7 +41,7 @@ function Invoke-D5Experiment {
 
   $stdout = Join-Path $runRoot "stdout.txt"
   $stderr = Join-Path $runRoot "stderr.txt"
-  Write-Step "RUN $runId/05 — $($Experiment.Label)"
+  Write-Step "RUN $runId/05 - $($Experiment.Label)"
   $arguments = @(
     "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $GeneratedRunner,
     "-VendorRead", "None",
@@ -179,7 +179,7 @@ $Manifest = [ordered]@{
 }
 $Manifest | ConvertTo-Json -Depth 14 | Set-Content (Join-Path $CampaignRoot "campaign_manifest.json") -Encoding UTF8
 
-Write-Step "NORMALIZE → CHALLENGE → CERTIFY"
+Write-Step "NORMALIZE - CHALLENGE - CERTIFY"
 $Python = Resolve-Python
 $pythonArguments = @($Python.Prefix) + @(
   $Analyzer, "analyze", "--campaign", $CampaignRoot, "--output", $SanitizedRoot
