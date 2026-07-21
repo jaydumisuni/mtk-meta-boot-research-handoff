@@ -24,7 +24,7 @@ Purpose: preserve and advance the D2/D3/D4/D5 MTK META boot, existing-META attac
 
 ## Current Technical State
 
-- The TTG-owned raw Preloader helper reliably catches VID_0E8D PID_2000 and reaches the `ADVEMETA` and `METAMETA` response stages.
+- The TTG-owned raw Preloader helper reliably catches VID_0E8D PID_2000 and reaches the `ADVEMETA` and `METAMETA` response stages, but it has not independently produced PID_2007.
 - An observed-product timing run proved the complete PID_2000 to PID_2007 transition and immediate TTG D4 attachment.
 - Existing META attach via native `SP_META_ConnectInMetaModeByUSB` on VID_0E8D PID_2007 succeeded.
 - Read-only `SP_META_GetTargetVerInfo_r` and `SP_META_GetChipID_r` succeeded.
@@ -32,6 +32,11 @@ Purpose: preserve and advance the D2/D3/D4/D5 MTK META boot, existing-META attac
 - Device APDB inventory and host-side NVRAM initialization were reached.
 - The separate MD/NVRAM service connector remains the focused unresolved part.
 - D5 now compares five evidence-backed bridge selector hypotheses rather than repeating one hard-coded request.
+
+The legacy D5 campaign includes experiments outside the current minimal privacy
+boundary. Do not run it for the guarded boot-only campaign. The active gate is
+`RUN_TTG_BOOT_META_GOLDEN_GATE.ps1`, limited to boot state plus non-unique
+`TargetVerInfo`/`ChipID` result codes.
 
 ## TTG Boot META Golden Gate
 
@@ -51,6 +56,21 @@ VID_0E8D PID_2000 Preloader
 ```
 
 For timing comparison with an authorized external product, use `RUN_TTG_OBSERVED_PRODUCT_HOT_PID2007_WATCH.ps1`. The external product name is a runtime label only. The watcher stores USB role, VID/PID, COM name, and read-only D4 result, but excludes full device-instance identifiers and all login/session data.
+
+Regenerate the X-Ray/Sergeant-style evidence council from local sanitized audit
+metadata:
+
+```powershell
+python .\tools\mtk_meta\analyze_boot_evidence.py `
+  --audit-root "<local-audit-root>" `
+  --metacore-inventory "<sanitized-metacore-string-inventory>" `
+  --json .\reports\TTG_META_BOOT_EVIDENCE_COUNCIL.json `
+  --markdown .\reports\TTG_META_BOOT_EVIDENCE_COUNCIL.md
+```
+
+The analyzer emits counts and classifications only. It never publishes raw
+frames, authentication material, identifiers, proprietary binaries, or local
+paths.
 
 ## One-command D5 campaign
 
@@ -99,7 +119,10 @@ See [`reports/D5_META_INVESTIGATION_PROTOCOL.md`](reports/D5_META_INVESTIGATION_
 
 ## Older D4 path
 
-`jaydumisuni/mtkclient-meta-mode` is the proven META boot helper. The D4 read path remains:
+`jaydumisuni/mtkclient-meta-mode` is a protocol research reference, not certified
+proof for this target. The only successful boot observed so far came from the
+authorized external product; TTG independently proved the existing-META D4 read
+path afterward.
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\tools\mtk_meta\RUN_D4_SAFE_READ_ORCHESTRATOR.ps1 -BootIfNeeded

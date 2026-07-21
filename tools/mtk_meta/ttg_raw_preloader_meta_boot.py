@@ -23,8 +23,13 @@ KNOWN_TOKENS = (
 class UnsupportedSlaControlFrame(RuntimeError):
     pass
 
+
+STARTED_AT = time.monotonic()
+
+
 def log(msg):
-    print(msg, flush=True)
+    elapsed_ms = int((time.monotonic() - STARTED_AT) * 1000)
+    print(f"{msg} t_ms={elapsed_ms}", flush=True)
 
 
 def port_rows():
@@ -61,18 +66,6 @@ def safe_port_label(port):
     vid = f"{port.vid:04X}" if port.vid is not None else "----"
     pid = f"{port.pid:04X}" if port.pid is not None else "----"
     return f"{port.device} {port.description or ''} VID_{vid} PID_{pid}"
-
-
-def read_for(ser, seconds, size=512):
-    out = b""
-    end = time.time() + seconds
-    while time.time() < end and len(out) < size:
-        part = ser.read(min(64, size - len(out)))
-        if part:
-            out += part
-        else:
-            time.sleep(0.03)
-    return out
 
 
 def read_until(ser, token, seconds, size=512):
@@ -165,32 +158,9 @@ def send_disconnect(ser):
         log(f"[INFO] DISCONNECT write failed during handoff: {exc!r}")
 
 
-def probe_at(port):
-    try:
-        with serial.Serial(port, 115200, timeout=0.5, write_timeout=0.5) as s:
-            try:
-                s.reset_input_buffer()
-                s.reset_output_buffer()
-            except Exception:
-                pass
-            write_pause(s, b"ATE0\r\n", 0.5)
-            r = s.read(256)
-            if b"OK" in r or b"AT" in r:
-                log(f"[AT] {port} answered ATE0; length={len(r)}")
-                return True
-            write_pause(s, b"AT\r\n", 0.5)
-            r = s.read(256)
-            if b"OK" in r or b"AT" in r:
-                log(f"[AT] {port} answered AT; length={len(r)}")
-            return b"OK" in r or b"AT" in r
-    except Exception as exc:
-        return False
-
-
 def wait_service_port(baseline, seconds):
     end = time.time() + seconds
-    probed = set()
-    last_hidden_scan = 0
+    reported = set()
     while time.time() < end:
         meta = find_meta()
         if meta:
@@ -199,28 +169,13 @@ def wait_service_port(baseline, seconds):
 
         current = {p.device: p for p in serial.tools.list_ports.comports()}
         for dev, info in current.items():
-            if not dev or dev in baseline or dev in probed:
+            if not dev or dev in baseline or dev in reported:
                 continue
-            probed.add(dev)
+            reported.add(dev)
             log(f"[PORT] New COM: {safe_port_label(info)}")
             if (info.vid or 0) == 0x0E8D and (info.pid or 0) == 0x2007:
                 log(f"[SUCCESS] PID_2007 META found through new-port watch: {dev}")
                 return {"kind": "pid2007", "port": dev, "description": info.description, "vid": info.vid, "pid": info.pid}
-            if probe_at(dev):
-                return {"kind": "at_service", "port": dev, "description": info.description, "vid": info.vid, "pid": info.pid}
-
-        # Windows sometimes exposes the new modem/META COM port before list_ports
-        # reports it. Probe boundedly so we do not miss the short service window.
-        if time.time() - last_hidden_scan > 2:
-            last_hidden_scan = time.time()
-            current_names = set(current.keys())
-            for number in range(1, 101):
-                dev = f"COM{number}"
-                if dev in baseline or dev in probed or dev in current_names:
-                    continue
-                probed.add(dev)
-                if probe_at(dev):
-                    return {"kind": "at_service", "port": dev, "description": "hidden COM scan", "vid": None, "pid": None}
         time.sleep(0.05)
     return None
 

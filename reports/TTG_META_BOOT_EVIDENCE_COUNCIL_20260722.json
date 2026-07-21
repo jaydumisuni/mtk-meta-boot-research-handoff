@@ -1,0 +1,76 @@
+{
+  "schema": "ttg.meta_boot_evidence_council.v1",
+  "verdict": "BLOCKED_CALLBACK_AUTH_REQUIRED",
+  "counts": {
+    "campaigns_with_evidence": 19,
+    "preloader_windows": 22,
+    "ready_misses": 0,
+    "metasla_responses": 11,
+    "zero_length_sla_reads": 1,
+    "metaforb_reads": 5,
+    "static_256_attempts": 5,
+    "advemeta_accepts": 10,
+    "certified_raw_pid2007_transitions": 0,
+    "existing_meta_d4_passes": 1,
+    "legacy_false_passes": 1
+  },
+  "metacore_context_markers": {
+    "boot_argument_required": true,
+    "challenge_callback": true,
+    "challenge_end_callback": true,
+    "sla_start_state": true
+  },
+  "hypotheses": [
+    {
+      "id": "H1",
+      "hypothesis": "TTG misses the short Preloader or READY window.",
+      "verdict": "REFUTED",
+      "confidence": 0.99,
+      "evidence": "22 Preloader windows; 0 READY misses."
+    },
+    {
+      "id": "H2",
+      "hypothesis": "ADVEMETA acceptance is sufficient to enumerate Kernel META.",
+      "verdict": "REFUTED",
+      "confidence": 0.99,
+      "evidence": "10 ATEMEVDX accepts; 0 certified raw PID_2007 transitions."
+    },
+    {
+      "id": "H3",
+      "hypothesis": "The historical static 256-byte response completes this target's SLA stage.",
+      "verdict": "REFUTED",
+      "confidence": 0.99,
+      "evidence": "5 historical attempts; 0 certified raw PID_2007 transitions."
+    },
+    {
+      "id": "H4",
+      "hypothesis": "A callback-driven SLA boot context is required after METASLA.",
+      "verdict": "SUPPORTED",
+      "confidence": 0.99,
+      "evidence": "11 METASLA responses; 1 zero-length post-SLASTART reads; 4/4 MetaCore context markers."
+    },
+    {
+      "id": "H5",
+      "hypothesis": "The existing-META D4 read-only attach layer is the boot blocker.",
+      "verdict": "REFUTED",
+      "confidence": 0.99,
+      "evidence": "1 read-only D4 attach passes after PID_2007 already existed."
+    }
+  ],
+  "boundary": {
+    "allowed": [
+      "token classification",
+      "timing counts",
+      "export/signature metadata",
+      "read-only D4 result codes"
+    ],
+    "blocked": [
+      "authentication payload extraction",
+      "key replay",
+      "identifier reads",
+      "NVRAM/NVDATA access",
+      "write/reset/unlock operations"
+    ]
+  },
+  "rule": "External products and historical probes are witnesses; only a fresh TTG raw transition plus D4 attach can certify boot."
+}
