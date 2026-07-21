@@ -24,12 +24,33 @@ Purpose: preserve and advance the D2/D3/D4/D5 MTK META boot, existing-META attac
 
 ## Current Technical State
 
+- The TTG-owned raw Preloader helper reliably catches VID_0E8D PID_2000 and reaches the `ADVEMETA` and `METAMETA` response stages.
+- An observed-product timing run proved the complete PID_2000 to PID_2007 transition and immediate TTG D4 attachment.
 - Existing META attach via native `SP_META_ConnectInMetaModeByUSB` on VID_0E8D PID_2007 succeeded.
 - Read-only `SP_META_GetTargetVerInfo_r` and `SP_META_GetChipID_r` succeeded.
 - SP modem inventory functions through the AP handle succeeded for capability/type/info/image/mode/status/database paths.
 - Device APDB inventory and host-side NVRAM initialization were reached.
 - The separate MD/NVRAM service connector remains the focused unresolved part.
 - D5 now compares five evidence-backed bridge selector hypotheses rather than repeating one hard-coded request.
+
+## TTG Boot META Golden Gate
+
+Run the standalone TTG boot gate from the main research project:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\mtk_meta\RUN_TTG_BOOT_META_GOLDEN_GATE.ps1
+```
+
+The gate accepts only this proof chain:
+
+```text
+VID_0E8D PID_2000 Preloader
+  -> VID_0E8D PID_2007 Kernel META
+  -> native D4 attach
+  -> TargetVerInfo and ChipID success
+```
+
+For timing comparison with an authorized external product, use `RUN_TTG_OBSERVED_PRODUCT_HOT_PID2007_WATCH.ps1`. The external product name is a runtime label only. The watcher stores USB role, VID/PID, COM name, and read-only D4 result, but excludes full device-instance identifiers and all login/session data.
 
 ## One-command D5 campaign
 
