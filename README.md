@@ -72,6 +72,10 @@ The analyzer emits counts and classifications only. It never publishes raw
 frames, authentication material, identifiers, proprietary binaries, or local
 paths.
 
+See `reports/TTG_METACORE_BOOT_ARG_LAYOUT_20260722.md` for the recovered
+`SP_Preloader_BootMode` wrapper signatures and sanitized 32-bit boot-context
+layout.
+
 ## One-command D5 campaign
 
 Pull this repository, then run:
