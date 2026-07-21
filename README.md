@@ -76,6 +76,17 @@ See `reports/TTG_METACORE_BOOT_ARG_LAYOUT_20260722.md` for the recovered
 `SP_Preloader_BootMode` wrapper signatures and sanitized 32-bit boot-context
 layout.
 
+For a local matched 10.2412 package, build the corrected guarded wrapper probe:
+
+```powershell
+.\tools\mtk_meta\RUN_TTG_MTK_FUNCTIONS_PRELOADER_CONNECT.ps1 `
+  -BackendRoot "<local-matched-backend>"
+```
+
+The default is build-only. Add `-Run` only for a controlled powered-off-device
+test. The probe calls only package initialization, read-only Preloader connect,
+and package release.
+
 ## One-command D5 campaign
 
 Pull this repository, then run:

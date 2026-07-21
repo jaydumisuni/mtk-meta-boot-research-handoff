@@ -81,11 +81,41 @@ or its exact MetaCore backend directory. They therefore establish useful ABI
 shapes only; they are not evidence that the observed product loads either
 module. No callback is invoked, copied, or packaged by this handoff.
 
+## Matching 10.2412 wrapper generation
+
+The separate TTG-staged 10.2412 package must not be conflated with the exact
+observed-product MetaCore build above. Its direct export is
+`_Preloader_BootMode@8`, and its `MTK_Functions.dll` exposes two higher-level
+wrappers:
+
+```text
+SPMeta_Preloader_BootMode(int preloader_com, bool option)
+SPMeta_ConnectWithPreloader(int preloader_com, int *output_com)
+```
+
+Disassembly proves that `SPMeta_Preloader_BootMode` normalizes its second
+argument to zero or one. Earlier tests using values `1`, `4`, and `60000`
+therefore did not test three boot modes; all nonzero values selected the same
+Boolean state.
+
+`SPMeta_ConnectWithPreloader` writes its parsed output through the second
+argument. An earlier probe passed `60000` as though it were a timeout, causing
+an access violation when the wrapper wrote through that invalid address. The
+corrected TTG probe supplies an initialized integer address.
+
+The object package also resolves companion folders relative to the calling
+executable. A valid local layout requires the TTG probe to be adjacent to
+`Objects` and `MtkCoreDlls2412`, with `QT_QPA_PLATFORM_PLUGIN_PATH` pointing to
+the matching `plugins/platforms` directory. This was verified offline: the
+corrected package reaches `BACKEND_READY` and exits cleanly when no device is
+connected.
+
 ## Engineering conclusion
 
 The working entry point requires a fully initialized boot structure and, for
 this target's `METASLA` path, valid callback wiring. A COM number or mode value
-cannot substitute for this structure. The safe next research gate is to recover
-the callback semantics and initialization ownership from exported metadata,
-official SDK material, or open source. It is not safe to invoke the function
-with guessed callback pointers or to replay opaque authentication frames.
+cannot substitute for this structure at the direct exact-build MetaCore layer.
+The matched 10.2412 wrapper package may own that initialization internally and
+is tested only through its documented wrapper-shaped boundary. It is not safe
+to invoke direct MetaCore functions with guessed callback pointers or to replay
+opaque authentication frames.
