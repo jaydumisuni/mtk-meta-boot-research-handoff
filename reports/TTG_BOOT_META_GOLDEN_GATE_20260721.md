@@ -20,14 +20,63 @@ Non-unique target metadata confirmed:
 - Build date: Thu Sep 4 13:04:01 CST 2025
 - Software branch: alps-mp-s0.mp1.rc-V17.23_reallytek.s0mp1rc.k61v1.64.bsp_P24
 
+## Sanitized Observed-Product Sequence
+
+The observed external product opened the Preloader COM port at `921600`, even
+parity, 8 data bits, and 1 stop bit. A metadata-only serial trace recorded this
+control sequence without retaining opaque payload bytes:
+
+```text
+serial line setup and purge
+  -> METAMETA
+  -> 12-byte control acknowledgement
+  -> serial line reset and purge
+  -> SLASTART + NUL
+  -> opaque 16-byte control frame
+  -> 12-byte control acknowledgement
+  -> opaque 16-byte control frame
+  -> DISCONNECT
+  -> PID_2007 approximately 13 seconds later
+```
+
+No 256-byte response was observed. Earlier assumptions that this target uses a
+static 256-byte RSA response are therefore rejected.
+
 ## Standalone TTG Status
 
-The TTG raw helper reliably catches PID_2000 and reaches both observed Preloader protocol branches:
+TTG independently catches `PID_2000`, sends the documented mode token, and can
+attach read-only after another authorized tool has placed the phone in
+`PID_2007`. TTG has **not yet independently reproduced the two opaque 16-byte
+control frames**, so a standalone `PID_2000 -> PID_2007` transition is not yet
+proven.
 
-- `ADVEMETA` receives `ATEMEVDX`.
-- `METAMETA` receives `METASLA`; `SLASTART` then receives `METAFORB`.
+The guarded helper now fails closed at that boundary. It does not guess, capture,
+store, or replay vendor authentication or activation material. A run where the
+phone is already in `PID_2007`, or where no raw mode was attempted, is labeled
+`attach-only-pass` and cannot be reported as a full golden-gate pass.
 
-The remaining gap is the final serial timing and handle-lifetime behavior that causes Kernel META to remain enumerated as PID_2007. No vendor executable, DLL, database, account material, session data, or proprietary binary is included in this repository.
+No vendor executable, DLL, database, account material, session data, or
+proprietary binary is included in this repository.
+
+## Fresh TTG Test - 2026-07-22
+
+A fresh, fully powered-off test caught both short Preloader windows:
+
+```text
+METAMETA:
+  PID_2000 -> READY -> METASLA -> 12-byte acknowledgement -> SLASTART
+  -> zero inbound challenge bytes -> blocked before required outbound control frame
+  -> no PID_2007
+
+ADVEMETA:
+  PID_2000 -> READY -> ATEMEVDX -> DISCONNECT
+  -> no PID_2007
+```
+
+This rejects the earlier assumption that TTG should wait for `METAFORB` after
+`SLASTART` on this target. The observed external product generates its first
+opaque 16-byte frame locally and sends it immediately. The fresh TTG run is
+recorded as `blocked-no-pid2007`; D4 was correctly skipped.
 
 ## Privacy Boundary
 

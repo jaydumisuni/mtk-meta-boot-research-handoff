@@ -5,7 +5,7 @@ param(
     [ValidateRange(10,240)]
     [int]$RawPostBootWaitSeconds = 90,
 
-    [string]$RawBootModes = "ADVEMETA,METAMETA",
+    [string]$RawBootModes = "METAMETA,ADVEMETA",
 
     [ValidateRange(10,180)]
     [int]$D4TimeoutSeconds = 90,
@@ -195,6 +195,9 @@ function Invoke-RawBoot {
         Start-Sleep -Milliseconds 300
     }
 
+    try { $process.WaitForExit() } catch {}
+    $rawExitCode = try { $process.ExitCode } catch { $null }
+
     $resultPath = Join-Path $rawAudit "raw_preloader_boot_result.json"
     $result = $null
     if (Test-Path -LiteralPath $resultPath) {
@@ -204,7 +207,7 @@ function Invoke-RawBoot {
 
     return [pscustomobject]@{
         Audit = $rawAudit
-        ExitCode = $process.ExitCode
+        ExitCode = $rawExitCode
         Result = $result
     }
 }
@@ -301,13 +304,19 @@ Save-State -AuditRoot $audit -Name "usb_after_raw" | Out-Null
 $meta = Get-KernelMetaPort
 
 if (!$meta) {
+    $rawError = if ($rawResult -and $rawResult.Result) { [string]$rawResult.Result.error } else { "" }
+    $nextStep = if ($rawError -match "unsupported") {
+        "Standalone boot is blocked at the required SLA control frame. Do not guess, capture, store, or replay vendor authentication material."
+    } else {
+        "Retry from a fully powered-off device with no buttons. If an observed external tool still produces PID_2007, compare only its boot-token timing and serial-port settings."
+    }
     $summary = [ordered]@{
         schema = "ttg.boot_meta_golden_gate.v1"
         generatedAt = (Get-Date).ToString("o")
         result = "blocked-no-pid2007"
         audit = $audit
         raw = $rawResult
-        next = "Retry from a fully powered-off device with no buttons. If an observed external tool still produces PID_2007, compare only its boot-token timing and serial-port settings."
+        next = $nextStep
     }
     $summary | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $audit "golden_gate_summary.json") -Encoding UTF8
     Write-Warn "No live PID_2007 Kernel META port found. D4 read is skipped."
@@ -319,17 +328,47 @@ Write-Ok "Kernel META confirmed: $($meta.Name) / $($meta.COM)"
 $d4 = Invoke-D4TargetRead -ProjectRoot $projectRoot -AuditRoot $audit
 Save-State -AuditRoot $audit -Name "usb_after_d4" | Out-Null
 
-$pass = $d4.Signals.connectSucceeded -and $d4.Signals.targetVerInfoSucceeded -and $d4.Signals.chipIdSucceeded -and !$d4.Signals.exceptionSeen -and !$d4.Signals.timeoutSeen
+$d4Pass = $d4.Signals.connectSucceeded -and $d4.Signals.targetVerInfoSucceeded -and $d4.Signals.chipIdSucceeded -and !$d4.Signals.exceptionSeen -and !$d4.Signals.timeoutSeen
+$rawAttemptCount = if ($rawResult -and $rawResult.Result -and $rawResult.Result.modes_attempted) {
+    @($rawResult.Result.modes_attempted).Count
+} else {
+    0
+}
+$rawTransitionProven = !$SkipRawBoot -and
+    $rawResult -and
+    $rawResult.Result -and
+    $rawResult.Result.success -eq $true -and
+    $rawResult.Result.service_kind -eq "pid2007" -and
+    $rawAttemptCount -gt 0
+$pass = $d4Pass -and $rawTransitionProven
+$resultLabel = if ($pass) {
+    "pass"
+} elseif ($SkipRawBoot -and $d4Pass) {
+    "attach-only-pass"
+} elseif ($d4Pass) {
+    "d4-pass-fresh-boot-unproven"
+} else {
+    "d4-read-incomplete"
+}
 $summary = [ordered]@{
     schema = "ttg.boot_meta_golden_gate.v1"
     generatedAt = (Get-Date).ToString("o")
-    result = if ($pass) { "pass" } else { "d4-read-incomplete" }
+    result = $resultLabel
     audit = $audit
     kernelMeta = $meta
     raw = $rawResult
+    proof = [ordered]@{
+        rawTransitionProven = $rawTransitionProven
+        rawModesAttempted = $rawAttemptCount
+        d4ReadPassed = $d4Pass
+    }
     d4 = $d4
     next = if ($pass) {
         "Promote this to the TTG Boot META read-only gate and extend only non-unique target metadata coverage."
+    } elseif ($SkipRawBoot -and $d4Pass) {
+        "Read-only attach passed, but this run intentionally skipped raw boot and does not prove TTG PID_2000 to PID_2007 transition."
+    } elseif ($d4Pass) {
+        "Read-only attach passed, but no fresh TTG raw mode attempt produced PID_2007. Repeat from fully powered off and disconnected."
     } else {
         "Inspect d4_targetverinfo_read stdout/stderr and keep identifier and NV access disabled."
     }
@@ -340,6 +379,12 @@ Write-Step "GOLDEN GATE RESULT"
 if ($pass) {
     Write-Ok "PASS: PID_2007 confirmed and D4 TargetVerInfo + ChipID succeeded."
     exit 0
+}
+
+if ($d4Pass) {
+    Write-Warn "ATTACH-ONLY PASS: D4 read succeeded, but a fresh TTG PID_2000 -> PID_2007 transition was not proven."
+    Write-Host (Join-Path $audit "golden_gate_summary.json")
+    exit 35
 }
 
 Write-Warn "D4 read incomplete. Summary saved:"
