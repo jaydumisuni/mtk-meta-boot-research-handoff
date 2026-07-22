@@ -355,5 +355,13 @@ Flow:
   conclusion about its live return value is recorded yet.
 - The launcher remains transition-only. It does not read identifiers or NVRAM,
   and it does not perform writes, reset, reboot, shell, unlock, or ADB actions.
+- A subsequent live BootMode run caught MediaTek Preloader on COM3. The wrapper
+  returned false, displayed that `Preloader_BootMode` could not be found, and
+  PID 2007 did not enumerate. Therefore both higher-level 10.2412 catalog
+  commands tested here are unavailable; repeating either wrapper is closed.
+- The next boot implementation must use the exact-build direct MetaCore boundary
+  with a correctly initialized `BOOT_ARG`, or an independently documented open
+  implementation. It must not guess callback pointers, replay authentication
+  traffic, or import account/session material.
 
 
