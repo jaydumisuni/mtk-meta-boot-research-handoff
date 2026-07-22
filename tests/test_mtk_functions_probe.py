@@ -14,6 +14,14 @@ def test_connect_wrapper_uses_real_output_pointer():
     assert "connect(preloader_port, &output_port)" in text
 
 
+def test_boot_mode_is_default_and_uses_boolean_option():
+    text = SCRIPT.read_text(encoding="utf-8")
+
+    assert '[string]$Operation = "BootMode"' in text
+    assert "typedef unsigned char (__stdcall *FN_BOOTMODE)(int, unsigned char);" in text
+    assert "boot_mode(preloader_port, 1)" in text
+
+
 def test_probe_resolves_only_approved_runtime_exports():
     text = SCRIPT.read_text(encoding="utf-8")
     resolved = re.findall(r'require_export\(module, "([^"]+)"\)', text)
@@ -21,6 +29,7 @@ def test_probe_resolves_only_approved_runtime_exports():
     assert resolved == [
         "_InitMtkDll@0",
         "_SPMeta_ConnectWithPreloader@8",
+        "_SPMeta_Preloader_BootMode@8",
         "_ReleaseMtkDll@0",
     ]
 

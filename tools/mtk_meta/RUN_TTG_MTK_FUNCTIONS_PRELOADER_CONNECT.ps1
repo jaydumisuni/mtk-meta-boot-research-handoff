@@ -7,6 +7,9 @@ param(
 
     [int]$WaitSeconds = 45,
 
+    [ValidateSet("BootMode", "Connect")]
+    [string]$Operation = "BootMode",
+
     [switch]$Run
 )
 
@@ -71,6 +74,7 @@ $source = @"
 typedef void (__stdcall *FN_INIT)(void);
 typedef void (__stdcall *FN_RELEASE)(void);
 typedef unsigned char (__stdcall *FN_CONNECT)(int, int*);
+typedef unsigned char (__stdcall *FN_BOOTMODE)(int, unsigned char);
 
 static int contains_ci(const char* text, const char* needle) {
     if (!text || !needle) return 0;
@@ -136,10 +140,11 @@ int main(int argc, char** argv) {
     SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX | SEM_NOOPENFILEERRORBOX);
 
     int wait_seconds = argc > 1 ? atoi(argv[1]) : 45;
+    int use_boot_mode = argc > 2 && _stricmp(argv[2], "boot") == 0;
     if (wait_seconds < 5 || wait_seconds > 180) return 2;
 
     printf("[guard] TTG read-only META boot transition probe\n");
-    printf("[guard] Allowed calls: InitMtkDll, ConnectWithPreloader, ReleaseMtkDll\n");
+    printf("[guard] Allowed calls: InitMtkDll, one Preloader transition wrapper, ReleaseMtkDll\n");
     printf("[guard] No device reads, identifiers, NVRAM, writes, reset, reboot, shell, unlock, or ADB\n");
 
     SetCurrentDirectoryA("$escapedBackend");
@@ -163,8 +168,9 @@ int main(int argc, char** argv) {
 
     FN_INIT init = reinterpret_cast<FN_INIT>(require_export(module, "_InitMtkDll@0"));
     FN_CONNECT connect = reinterpret_cast<FN_CONNECT>(require_export(module, "_SPMeta_ConnectWithPreloader@8"));
+    FN_BOOTMODE boot_mode = reinterpret_cast<FN_BOOTMODE>(require_export(module, "_SPMeta_Preloader_BootMode@8"));
     FN_RELEASE release = reinterpret_cast<FN_RELEASE>(require_export(module, "_ReleaseMtkDll@0"));
-    if (!init || !connect || !release) {
+    if (!init || !connect || !boot_mode || !release) {
         FreeLibrary(module);
         return 11;
     }
@@ -189,9 +195,14 @@ int main(int argc, char** argv) {
     }
 
     printf("[state] PRELOADER_FOUND com=%d\n", preloader_port);
-    int output_port = 0;
-    unsigned char connected = connect(preloader_port, &output_port);
-    printf("[state] CONNECT_RETURN success=%u output_com=%d\n", connected ? 1 : 0, output_port);
+    if (use_boot_mode) {
+        unsigned char booted = boot_mode(preloader_port, 1);
+        printf("[state] BOOTMODE_RETURN success=%u\n", booted ? 1 : 0);
+    } else {
+        int output_port = 0;
+        unsigned char connected = connect(preloader_port, &output_port);
+        printf("[state] CONNECT_RETURN success=%u output_com=%d\n", connected ? 1 : 0, output_port);
+    }
 
     int meta_port = 0;
     DWORD meta_deadline = GetTickCount() + 30000;
@@ -241,7 +252,8 @@ if (-not $Run) {
 }
 
 Write-Host "Power off the phone. Connect it without holding volume buttons when the probe starts waiting."
-$process = Start-Process -FilePath $runtimeExePath -ArgumentList $WaitSeconds -WorkingDirectory $backend -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath -PassThru -WindowStyle Hidden
+$operationArg = if ($Operation -eq "BootMode") { "boot" } else { "connect" }
+$process = Start-Process -FilePath $runtimeExePath -ArgumentList @($WaitSeconds, $operationArg) -WorkingDirectory $backend -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath -PassThru -WindowStyle Hidden
 $timeoutMs = ($WaitSeconds + 40) * 1000
 if (-not $process.WaitForExit($timeoutMs)) {
     $process.Kill()
@@ -251,6 +263,7 @@ if (-not $process.WaitForExit($timeoutMs)) {
 
 $approved = [ordered]@{
     schema = "ttg.mtk.preloader-connect.v1"
+    operation = $Operation
     exit_code = $process.ExitCode
     result = "UNKNOWN"
     preloader_detected = $false

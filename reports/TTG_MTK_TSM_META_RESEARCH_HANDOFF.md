@@ -339,4 +339,21 @@ Flow:
   - Enable ADB
   - shell command
 
+## 2026-07-22 live wrapper findings
+
+- The corrected `_SPMeta_ConnectWithPreloader@8` ABI was exercised only after
+  Windows enumerated MediaTek Preloader on COM3. The wrapper returned false,
+  left the output COM value at zero, and displayed that `ConnectWithPreloader`
+  could not be found. This proves the export exists in `MTK_Functions.dll` but
+  its command is absent from the matched 10.2412 object catalog.
+- The TTG launcher now defaults to `_SPMeta_Preloader_BootMode@8`, whose observed
+  wrapper shape is `(int preloaderCom, bool option)`. The option is passed as the
+  normalized value `1`; the earlier integer `60000` argument is prohibited.
+- Offline startup for the BootMode route reached `BACKEND_READY` with all
+  required exports resolved. Two subsequent 180-second live windows received no
+  `VID_0E8D&PID_2000` enumeration, so no BootMode vendor call was executed and no
+  conclusion about its live return value is recorded yet.
+- The launcher remains transition-only. It does not read identifiers or NVRAM,
+  and it does not perform writes, reset, reboot, shell, unlock, or ADB actions.
+
 
