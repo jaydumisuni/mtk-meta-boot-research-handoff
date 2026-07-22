@@ -265,16 +265,7 @@ int main(){
   __try{apDbPathRet=SpApDbPath?SpApDbPath(activeHandle,$TimeoutMs,spModemReq,apDbPathCnf):-1;printf("[ret] SpApDbPath=%d\n",apDbPathRet);PrintHex("SpApDbPathCnf",apDbPathCnf,512);}__except(EXCEPTION_EXECUTE_HANDLER){printf("[exception] SpApDbPath=0x%08lX\n",GetExceptionCode());}
   printf("[call] SP_META_MODEM_Get_EEInfo_r(activeHandle,timeout,zeroQuery,confirmation) read-only\n");
   __try{eeInfoRet=SpEeInfo?SpEeInfo(activeHandle,$TimeoutMs,spModemReq,eeInfoCnf):-1;printf("[ret] SpEeInfo=%d\n",eeInfoRet);PrintHex("SpEeInfoCnf",eeInfoCnf,512);}__except(EXCEPTION_EXECUTE_HANDLER){printf("[exception] SpEeInfo=0x%08lX\n",GetExceptionCode());}
-  unsigned char imeiRecNumOut[256]={0},imeiLocationOut[256]={0},calFlagEnumOut[2048]={0},rfCalEnvEnumOut[2048]={0};
-  int imeiRecNumRet=-1,imeiLocationRet=-1,calFlagEnumRet=-1,rfCalEnvEnumRet=-1;
-  printf("[call] META_MISC_GetIMEIRecNum_r(activeHandle,timeout,out) read-only\n");
-  __try{imeiRecNumRet=GetImeiRecNum?GetImeiRecNum(activeHandle,$TimeoutMs,imeiRecNumOut):-1;printf("[ret] ImeiRecNum=%d\n",imeiRecNumRet);PrintHex("ImeiRecNumOut",imeiRecNumOut,64);}__except(EXCEPTION_EXECUTE_HANDLER){printf("[exception] ImeiRecNum=0x%08lX\n",GetExceptionCode());}
-  printf("[call] META_MISC_GetIMEILocation_r(activeHandle,timeout,out) read-only\n");
-  __try{imeiLocationRet=GetImeiLocation?GetImeiLocation(activeHandle,$TimeoutMs,imeiLocationOut):-1;printf("[ret] ImeiLocation=%d\n",imeiLocationRet);PrintHex("ImeiLocationOut",imeiLocationOut,128);}__except(EXCEPTION_EXECUTE_HANDLER){printf("[exception] ImeiLocation=0x%08lX\n",GetExceptionCode());}
-  printf("[call] META_MISC_GetCalFlagEnum_r(activeHandle,timeout,out) read-only\n");
-  __try{calFlagEnumRet=GetCalFlagEnum?GetCalFlagEnum(activeHandle,$TimeoutMs,calFlagEnumOut):-1;printf("[ret] CalFlagEnum=%d\n",calFlagEnumRet);PrintHex("CalFlagEnumOut",calFlagEnumOut,256);}__except(EXCEPTION_EXECUTE_HANDLER){printf("[exception] CalFlagEnum=0x%08lX\n",GetExceptionCode());}
-  printf("[call] META_MISC_GetRfCalEnvEnum_r(activeHandle,timeout,out) read-only\n");
-  __try{rfCalEnvEnumRet=GetRfCalEnvEnum?GetRfCalEnvEnum(activeHandle,$TimeoutMs,rfCalEnvEnumOut):-1;printf("[ret] RfCalEnvEnum=%d\n",rfCalEnvEnumRet);PrintHex("RfCalEnvEnumOut",rfCalEnvEnumOut,256);}__except(EXCEPTION_EXECUTE_HANDLER){printf("[exception] RfCalEnvEnum=0x%08lX\n",GetExceptionCode());}
+  printf("[identifier-gate] skipped META_MISC IMEI/location/barcode/calibration helper calls for boot gate\n");
   int currentModem=-1,connectionInfo0=-1,connectionInfo1=-1,currentModemRet=-1,currentModemTypeRet=-1,connectionInfoRet=-1;
   unsigned int currentModemType=0xFFFFFFFF;
   printf("[call] META_QueryCurrentModem_r(activeHandle,outCurrentModem) read-only\n");
